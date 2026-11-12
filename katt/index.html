@@ -111,6 +111,27 @@ input[type=text]{font:inherit;font-size:1.1rem;padding:10px 14px;border-radius:1
 .hearts{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:20}
 .hearts span{position:absolute;bottom:-40px;font-size:30px;animation:float 1.6s ease-out forwards}
 
+ .pop{position:fixed;left:50%;top:38%;z-index:30;font-family:var(--display);font-weight:800;font-size:clamp(3rem,16vw,6rem);color:var(--accent);
+  -webkit-text-stroke:3px #fff;paint-order:stroke fill;text-shadow:0 6px 0 var(--accent-deep);transform:translate(-50%,-50%);pointer-events:none;
+  animation:pop 1.3s forwards;text-align:center;line-height:1;white-space:nowrap}
+.pop small{display:block;margin-top:8px;font-size:.38em;color:var(--sun);text-shadow:0 3px 0 #B07A1C}
+.moon{position:fixed;left:0;bottom:calc(8px + env(safe-area-inset-bottom,0px));width:120px;z-index:25;pointer-events:none;animation:moon 2.4s linear forwards}
+.moon .hat{position:absolute;top:-34px;left:50%;transform:translateX(-50%) rotate(-12deg);font-size:46px}
+.moon svg{display:block;animation:bob .28s ease-in-out infinite alternate}
+.moon .spark{position:absolute;right:-24px;bottom:10px;font-size:26px}
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:24}
+.shake{animation:shake .35s}
+.pin{align-items:center;text-align:center}
+.dots{display:flex;gap:16px;justify-content:center}
+.dots span{width:22px;height:22px;border-radius:50%;border:3px solid var(--muted)}
+.dots span.on{background:var(--ink);border-color:var(--ink)}
+.keys{display:grid;grid-template-columns:repeat(3,76px);gap:12px;justify-content:center}
+.keys .btn{padding:14px 0;font-size:1.6rem}
+@keyframes pop{0%{transform:translate(-50%,-50%) scale(.2) rotate(-14deg);opacity:0}18%{transform:translate(-50%,-50%) scale(1.2) rotate(5deg);opacity:1}
+  32%{transform:translate(-50%,-50%) scale(1) rotate(0)}80%{opacity:1}100%{transform:translate(-50%,-70%) scale(1.05);opacity:0}}
+@keyframes moon{from{transform:translateX(100vw)}to{transform:translateX(-140px)}}
+@keyframes bob{to{transform:translateY(-7px) rotate(-5deg)}}
+@keyframes shake{20%{transform:translateX(-10px)}40%{transform:translateX(10px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
 @keyframes boing{30%{transform:scale(1.08,.92)}60%{transform:scale(.95,1.06)}}
 @keyframes squish{30%{transform:scale(1.25,.75)}60%{transform:scale(.9,1.1)}}
 @keyframes wobble{25%{transform:rotate(-6deg)}75%{transform:rotate(6deg)}}
@@ -173,20 +194,29 @@ input[type=text]{font:inherit;font-size:1.1rem;padding:10px 14px;border-radius:1
   <div class="grid gal" id="galGrid"></div>
 </section>
 
+<!-- PIN -->
+<section id="pin" class="view pin" hidden>
+  <div class="top" style="width:100%"><h2>För vuxna</h2><button class="btn plain small" data-home>Hem</button></div>
+  <p class="bubble">Skriv in koden</p>
+  <div class="dots" id="dots"><span></span><span></span><span></span><span></span></div>
+  <div class="keys" id="keys"></div>
+</section>
+
 <!-- GROWN-UPS -->
 <section id="grown" class="view" hidden>
   <div class="top"><h2>För vuxna</h2><button class="btn plain small" data-home>Hem</button></div>
   <div class="card form">
     <label for="setName">Barnets namn<input type="text" id="setName" autocomplete="off"></label>
     <label for="setCat">Kattens namn<input type="text" id="setCat" autocomplete="off"></label>
-    <label class="check" for="setVoice"><input type="checkbox" id="setVoice"> Läs upp ord och meningar</label>
+    <label class="check" for="setVoice"><input type="checkbox" id="setVoice"> Läs upp ord när hon trycker på dem</label>
+    <label class="check" for="setSound"><input type="checkbox" id="setSound"> Musik och ljud när hon lyckas</label>
     <label for="setRate">Upplästempo<input type="range" id="setRate" min="0.6" max="1.1" step="0.05"></label>
     <p class="note" id="voiceNote"></p>
     <div class="row"><button class="btn mint small" id="saveSet">Spara</button><span class="note" id="savedMsg"></span></div>
   </div>
   <div class="card">
     <h3>Så funkar appen</h3>
-    <p class="note">Varje uppdrag tar 5–10 minuter: tre ordbilder, två meningar att förstå, en rörelseuppgift och en rituppgift. Hon kan trycka på varje ord för att höra det. Fel svar ger en ny chans och en ledtråd, aldrig minuspoäng. Efter uppdraget får hon en squishy.</p>
+    <p class="note">Varje uppdrag tar 5–10 minuter: tre ordbilder, två meningar att förstå, en rörelseuppgift och en rituppgift. Hon kan trycka på ett enskilt ord för att höra det, men hela meningar läses inte upp, så hon får läsa själv. Fel svar ger en ny chans och en ledtråd, aldrig minuspoäng. Efter uppdraget får hon en squishy.</p>
     <p class="note">Allt sparas bara i den här webbläsaren på den här enheten.</p>
   </div>
   <div class="card">
@@ -196,6 +226,7 @@ input[type=text]{font:inherit;font-size:1.1rem;padding:10px 14px;border-radius:1
 </section>
 </div>
 <div class="hearts" id="hearts"></div>
+<canvas id="confetti" hidden></canvas>
 
 <script>
 const $=s=>document.querySelector(s);
@@ -203,9 +234,9 @@ const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(
 const pick=a=>a[Math.random()*a.length|0];
 
 /* ---------- saved state ---------- */
-const DEF={name:"Isabella",cat:"Blixten",voice:true,rate:0.85,owned:[],drawings:[],missions:0};
-let S={...DEF};
-try{const r=localStorage.getItem("kattapp");if(r)S={...DEF,...JSON.parse(r)}}catch(e){}
+const fresh=()=>({name:"Isabella",cat:"Blixten",voice:true,sound:true,rate:0.85,owned:[],drawings:[],missions:0});
+let S=fresh();
+try{const r=localStorage.getItem("kattapp");if(r)S={...fresh(),...JSON.parse(r)}}catch(e){}
 function save(){try{localStorage.setItem("kattapp",JSON.stringify(S))}catch(e){
   if(S.drawings.length>3){S.drawings=S.drawings.slice(-3);try{localStorage.setItem("kattapp",JSON.stringify(S))}catch(e2){}}}}
 const fill=t=>t.replaceAll("{name}",S.name).replaceAll("{cat}",S.cat);
@@ -215,12 +246,12 @@ let voices=[];
 function loadVoices(){try{voices=speechSynthesis.getVoices()}catch(e){}}
 try{loadVoices();speechSynthesis.onvoiceschanged=loadVoices}catch(e){}
 const NATIVE=window.AndroidTTS;
-function speak(t){
-  if(!S.voice)return;
-  if(NATIVE){try{NATIVE.speak(t,S.rate)}catch(e){}return}
+function speak(t,pitch=1,force=false){
+  if(!S.voice&&!force)return;
+  if(NATIVE){try{NATIVE.speakPitch?NATIVE.speakPitch(t,S.rate,pitch):NATIVE.speak(t,S.rate)}catch(e){}return}
   try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="sv-SE";
     const v=voices.find(v=>(v.lang||"").toLowerCase().startsWith("sv"));if(v)u.voice=v;
-    u.rate=S.rate;speechSynthesis.speak(u)}catch(e){}
+    u.rate=S.rate;u.pitch=pitch;speechSynthesis.speak(u)}catch(e){}
 }
 const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function tappable(text){
@@ -326,7 +357,7 @@ const SQ=[
 ];
 
 /* ---------- drawings (SVG) ---------- */
-function catSVG(){return `<svg class="cat" id="catSvg" viewBox="0 0 200 210" role="img" aria-label="${esc(S.cat)}, en Maine Coon-katt">
+function catSVG(id="catSvg",cls="cat"){return `<svg class="${cls}" id="${id}" viewBox="0 0 200 210" role="img" aria-label="${esc(S.cat)}, en Maine Coon-katt">
  <path d="M150 170 C195 160 195 105 172 92 C165 88 160 96 166 102 C180 118 172 150 140 156Z" fill="#E3B482"/>
  <path d="M168 100 l6 6 M176 120 l8 2 M174 140 l8 -2" stroke="#D49A62" stroke-width="3.5" stroke-linecap="round"/>
  <ellipse cx="100" cy="160" rx="58" ry="42" fill="#EBC496"/>
@@ -367,9 +398,9 @@ function sqSVG(q,locked,cls=""){
 }
 
 /* ---------- navigation ---------- */
-const VIEWS=["home","mission","reward","collection","gallery","grown"];
+const VIEWS=["home","mission","reward","collection","gallery","pin","grown"];
 function show(id){VIEWS.forEach(v=>$("#"+v).hidden=v!==id);window.scrollTo(0,0);
-  if(id==="home")renderHome();if(id==="collection")renderColl();if(id==="gallery")renderGal();if(id==="grown")renderGrown();}
+  if(id==="home")renderHome();if(id==="collection")renderColl();if(id==="gallery")renderGal();if(id==="grown")renderGrown();if(id==="pin")renderPin();}
 document.querySelectorAll("[data-home]").forEach(b=>b.onclick=()=>show("home"));
 
 function renderHome(){
@@ -386,7 +417,7 @@ function renderHome(){
 let M=null;
 function newMission(){
   const words=shuffle(WORDS).slice(0,3), sents=shuffle(SENTS).slice(0,2);
-  M={i:0,steps:[...words.map(w=>({type:"word",w})),...sents.map(s=>({type:"sent",s})),{type:"do",d:pick(DOS)},{type:"draw",t:pick(DRAWS)}]};
+  M={i:0,streak:0,steps:[...words.map(w=>({type:"word",w})),...sents.map(s=>({type:"sent",s})),{type:"do",d:pick(DOS)},{type:"draw",t:pick(DRAWS)}]};
   show("mission");renderStep();
 }
 function renderPaws(){
@@ -408,7 +439,7 @@ function renderStep(){
     $("#sayBtn").onclick=()=>speak(st.w.w);
     answer(st.w.e,()=>{
       $("#after").innerHTML=`<div class="explain"><div class="read">${tappable(st.w.s)}</div></div><div style="margin-top:16px">${nextBtn()}</div>`;
-      speak("Rätt! "+st.w.s);$("#nextBtn").onclick=next;
+      $("#nextBtn").onclick=next;
     },()=>speak(st.w.w));
   }
   if(st.type==="sent"){
@@ -416,11 +447,9 @@ function renderStep(){
     stage.innerHTML=`<div class="card">
       <p class="ask">Läs meningen. Vilken bild passar?</p>
       <div class="read">${tappable(text)}</div>
-      <button class="btn plain small say" id="sayBtn">🔊 Lyssna på hela</button>
       <div class="pics">${opts.map(e=>`<button class="pic" data-e="${e}" aria-label="Bild">${e}</button>`).join("")}</div>
       <p class="feedback" id="fb" aria-live="polite"></p><div id="after"></div></div>`;
-    $("#sayBtn").onclick=()=>speak(text);
-    answer(st.s.a,()=>{$("#after").innerHTML=nextBtn();speak("Rätt!");$("#nextBtn").onclick=next},()=>speak(text));
+    answer(st.s.a,()=>{$("#after").innerHTML=nextBtn();$("#nextBtn").onclick=next},()=>{});
   }
   if(st.type==="do"){
     const text=fill(st.d.t);
@@ -428,22 +457,20 @@ function renderStep(){
       <p class="ask">Rörelsepaus! Läs och gör.</p>
       <div class="do-emoji" aria-hidden="true">${st.d.e}</div>
       <div class="read">${tappable(text)}</div>
-      <button class="btn plain small say" id="sayBtn">🔊 Lyssna</button>
       ${nextBtn("Jag gjorde det!")}</div>`;
-    $("#sayBtn").onclick=()=>speak(text);$("#nextBtn").onclick=()=>{hearts();next()};
+    $("#nextBtn").onclick=()=>{party();setTimeout(next,900)};
   }
   if(st.type==="draw"){
     const text=fill(st.t);
     stage.innerHTML=`<div class="card">
       <p class="ask">Ritdags! Läs vad du ska rita.</p>
       <div class="read">${tappable(text)}</div>
-      <button class="btn plain small say" id="sayBtn">🔊 Lyssna</button>
       <div class="padwrap"><canvas id="pad"></canvas></div>
       <div class="colors" id="colors"></div>
       <div class="row"><button class="btn plain small" id="sizeBtn">Tjock penna</button>
         <button class="btn plain small" id="clearBtn">Sudda allt</button></div>
       ${nextBtn("Klar med teckningen!")}</div>`;
-    $("#sayBtn").onclick=()=>speak(text);setupPad();
+    setupPad();
     $("#nextBtn").onclick=()=>{saveDrawing();next()};
   }
 }
@@ -453,9 +480,10 @@ function answer(right,onRight,replay){
   document.querySelectorAll(".pic").forEach(p=>p.onclick=()=>{
     if(done)return;const fb=$("#fb");
     if(p.dataset.e===right){done=true;p.classList.add("right");fb.className="feedback good";
-      fb.textContent=pick(["Rätt! Snyggt!","Ja! Du kan det här!","Superbra!","Mjau-bra!"]);hearts();onRight();}
+      M.streak=tries===0?M.streak+1:0;
+      fb.textContent=pick(["Rätt! Snyggt!","Ja! Du kan det här!","Superbra!","Mjau-bra!"]);party(false,M.streak);onRight();}
     else{tries++;p.classList.remove("wrong");void p.offsetWidth;p.classList.add("wrong");fb.className="feedback try";
-      if(tries===1){fb.textContent="Nästan! Lyssna en gång till.";replay()}
+      if(tries===1){fb.textContent="Nästan! Läs en gång till.";replay()}
       else{fb.textContent="Titta på bilden med prickad kant.";document.querySelector(`.pic[data-e="${right}"]`).classList.add("hint");replay()}}
   });
 }
@@ -494,8 +522,8 @@ function finish(){
   $("#rewardTitle").textContent=`Bra jobbat, ${S.name}!`;
   $("#rewardSq").innerHTML=sqSVG(q,false,"sq-big");
   $("#rewardName").textContent=left.length?q.n:`${q.n} kom på besök igen!`;
-  const el=$("#rewardSq svg");el.onclick=()=>{el.classList.remove("squish");void el.offsetWidth;el.classList.add("squish");hearts()};
-  hearts();speak(`Bra jobbat ${S.name}! Du fick ${q.n}.`);
+  const el=$("#rewardSq svg");el.onclick=()=>{el.classList.remove("squish");void el.offsetWidth;el.classList.add("squish");squishSound();hearts()};
+  party(true,0,`Bra jobbat ${S.name}! Du fick ${q.n}.`);
 }
 $("#rewardToColl").onclick=()=>show("collection");$("#rewardHome").onclick=()=>show("home");
 
@@ -512,15 +540,83 @@ function renderGal(){
 
 /* ---------- grown-ups ---------- */
 function renderGrown(){
-  $("#setName").value=S.name;$("#setCat").value=S.cat;$("#setVoice").checked=S.voice;$("#setRate").value=S.rate;
+  $("#setName").value=S.name;$("#setCat").value=S.cat;$("#setVoice").checked=S.voice;$("#setSound").checked=S.sound;$("#setRate").value=S.rate;
   $("#savedMsg").textContent="";$("#resetYes").hidden=true;
   let sv=voices.some(v=>(v.lang||"").toLowerCase().startsWith("sv"));if(NATIVE){try{sv=NATIVE.hasSwedish()}catch(e){}}
   $("#voiceNote").textContent=sv?"En svensk röst finns på enheten.":"Hittar ingen svensk röst än. Uppläsningen kan låta konstig. På Android: Inställningar → Text till tal → välj Google och ladda ner svenska. På iPad/iPhone: Inställningar → Hjälpmedel → Uppläst innehåll → Röster → Svenska.";
 }
 $("#saveSet").onclick=()=>{S.name=$("#setName").value.trim()||"Isabella";S.cat=$("#setCat").value.trim()||"Blixten";
-  S.voice=$("#setVoice").checked;S.rate=parseFloat($("#setRate").value)||.85;save();$("#savedMsg").textContent="Sparat!";speak("Hej "+S.name)};
+  S.voice=$("#setVoice").checked;S.sound=$("#setSound").checked;S.rate=parseFloat($("#setRate").value)||.85;save();$("#savedMsg").textContent="Sparat!";speak("Hej "+S.name)};
 $("#resetBtn").onclick=()=>$("#resetYes").hidden=false;
-$("#resetYes").onclick=()=>{S={...DEF,name:S.name,cat:S.cat,voice:S.voice,rate:S.rate};save();show("home")};
+$("#resetYes").onclick=()=>{S={...fresh(),name:S.name,cat:S.cat,voice:S.voice,sound:S.sound,rate:S.rate};save();show("home")};
+
+const PIN="0000";let typed="";
+function renderPin(){typed="";drawDots();
+  $("#keys").innerHTML=["1","2","3","4","5","6","7","8","9","","0","⌫"].map(k=>k?`<button class="btn plain" data-k="${k}" aria-label="${k==="⌫"?"Sudda":k}">${k}</button>`:"<span></span>").join("")}
+function drawDots(){document.querySelectorAll("#dots span").forEach((d,i)=>d.classList.toggle("on",i<typed.length))}
+$("#keys").onclick=e=>{const b=e.target.closest("[data-k]");if(!b)return;const k=b.dataset.k;
+  if(k==="⌫"){typed=typed.slice(0,-1);drawDots();return}
+  if(typed.length>=4)return;typed+=k;drawDots();
+  if(typed.length===4){if(typed===PIN)setTimeout(()=>show("grown"),150);
+    else{const d=$("#dots");d.classList.remove("shake");void d.offsetWidth;d.classList.add("shake");setTimeout(()=>{typed="";drawDots()},400)}}};
+
+/* ---------- party: sound, confetti, dancing Blixten ---------- */
+let AC=null,NOISE=null;
+function ac(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){return null}}
+  if(AC.state==="suspended")AC.resume();return AC}
+const hz=n=>440*Math.pow(2,(n-69)/12);
+function note(a,t,midi,dur,type="square",vol=.12,cut=1800){
+  const o=a.createOscillator(),g=a.createGain(),f=a.createBiquadFilter();
+  o.type=type;o.frequency.value=hz(midi);f.type="lowpass";f.frequency.value=cut;
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.connect(f);f.connect(g);g.connect(a.destination);o.start(t);o.stop(t+dur+.05)}
+function kick(a,t){const o=a.createOscillator(),g=a.createGain();o.frequency.setValueAtTime(140,t);o.frequency.exponentialRampToValueAtTime(40,t+.14);
+  g.gain.setValueAtTime(.7,t);g.gain.exponentialRampToValueAtTime(.001,t+.18);o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+.2)}
+function snare(a,t,vol=.35){if(!NOISE){NOISE=a.createBuffer(1,a.sampleRate*.3,a.sampleRate);const d=NOISE.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1}
+  const s=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();s.buffer=NOISE;f.type="highpass";f.frequency.value=1500;
+  g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+.15);s.connect(f);f.connect(g);g.connect(a.destination);s.start(t);s.stop(t+.2)}
+function groove(big){
+  const a=ac();if(!a||!S.sound)return 0;
+  const st=.12,t0=a.currentTime+.05,bars=big?2:1;
+  const bass=[40,0,40,43,45,0,43,40,47,0,45,0,43,0,45,47];
+  for(let b=0;b<bars;b++)for(let i=0;i<16;i++){const t=t0+(b*16+i)*st;
+    if(i%4===0)kick(a,t);if(i%8===4)snare(a,t);if(i%2===1)snare(a,t,.06);
+    if(bass[i])note(a,t,bass[i],st*1.6,"sawtooth",.16,700)}
+  const end=t0+bars*16*st;
+  [64,67,71,74].forEach(m=>note(a,end,m,.35,"square",.07,3000));
+  [76,79,83,88].forEach((m,i)=>note(a,end+.1+i*.06,m,.18,"triangle",.1,5000));
+  return (end-a.currentTime+.35)*1000}
+function chime(){const a=ac();if(!a||!S.sound)return 0;const t=a.currentTime+.02;
+  [72,76,79,84].forEach((m,i)=>note(a,t+i*.07,m,.25,"triangle",.14,6000));snare(a,t+.28,.2);return 600}
+function squishSound(){const a=ac();if(!a||!S.sound)return;const t=a.currentTime,o=a.createOscillator(),g=a.createGain();
+  o.type="sine";o.frequency.setValueAtTime(300,t);o.frequency.exponentialRampToValueAtTime(900,t+.18);
+  g.gain.setValueAtTime(.25,t);g.gain.exponentialRampToValueAtTime(.001,t+.25);o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+.3)}
+const YELLS=["Hii-hii!","Ååuu!","Hii-hii!","Shamåne!"];
+function party(big=false,streak=0,after=""){
+  const groovy=big||streak>=2||Math.random()<.35;
+  const ms=groovy?groove(big):chime();
+  if(S.sound&&groovy)setTimeout(()=>speak(pick(YELLS),2,true),Math.max(ms-300,0));
+  if(after)setTimeout(()=>speak(after),ms+900);
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  confetti(big?220:90);hearts();
+  const pop=document.createElement("div");pop.className="pop";
+  pop.innerHTML=esc(big?"MÄSTARE!":pick(["SUPER!","WOW!","GRYMT!","MJAU-BRA!","STJÄRNA!"]))+(streak>=2?`<small>${streak} i rad! 🔥</small>`:"");
+  document.body.appendChild(pop);setTimeout(()=>pop.remove(),1400);
+  if(groovy){const m=document.createElement("div");m.className="moon";
+    m.innerHTML=`<span class="hat">🎩</span>${catSVG("moonCat","")}<span class="spark">✨</span>`;
+    document.body.appendChild(m);setTimeout(()=>m.remove(),2500)}
+}
+let confettiRun=0;
+function confetti(n){
+  const c=$("#confetti");c.hidden=false;const dpr=window.devicePixelRatio||1,W=innerWidth,H=innerHeight;
+  c.width=W*dpr;c.height=H*dpr;const g=c.getContext("2d");g.setTransform(dpr,0,0,dpr,0,0);
+  const cols=["#FF6F9F","#4FC3A8","#FFC93C","#9B5DE5","#3A86FF","#FF9F43"];
+  const P=Array.from({length:n},()=>({x:W/2+(Math.random()-.5)*60,y:H*.42,vx:(Math.random()-.5)*14,vy:-Math.random()*14-4,
+    r:Math.random()*6+4,c:pick(cols),a:Math.random()*6,va:(Math.random()-.5)*.4}));
+  const id=++confettiRun,t0=performance.now();
+  (function frame(t){if(id!==confettiRun)return;g.clearRect(0,0,W,H);
+    P.forEach(p=>{p.vy+=.45;p.vx*=.99;p.x+=p.vx;p.y+=p.vy;p.a+=p.va;g.save();g.translate(p.x,p.y);g.rotate(p.a);g.fillStyle=p.c;g.fillRect(-p.r,-p.r/2,p.r*2,p.r);g.restore()});
+    if(t-t0<2600)requestAnimationFrame(frame);else{g.clearRect(0,0,W,H);c.hidden=true}})(t0)}
 
 /* ---------- fun ---------- */
 function hearts(){
@@ -534,6 +630,6 @@ $("#startBtn").onclick=newMission;
 $("#quitBtn").onclick=()=>show("home");
 $("#toCollection").onclick=()=>show("collection");
 $("#toGallery").onclick=()=>show("gallery");
-$("#toGrown").onclick=()=>show("grown");
+$("#toGrown").onclick=()=>show("pin");
 show("home");
 </script>

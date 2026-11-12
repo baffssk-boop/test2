@@ -31,9 +31,14 @@ class MainActivity : Activity() {
         }
 
         @JavascriptInterface
-        fun speak(text: String, rate: Float) {
+        fun speak(text: String, rate: Float) = speakPitch(text, rate, 1f)
+
+        /** Hög tonhöjd används för de glada "hii-hii"-ropen. */
+        @JavascriptInterface
+        fun speakPitch(text: String, rate: Float, pitch: Float) {
             if (!ready) return
             tts.setSpeechRate(rate)
+            tts.setPitch(pitch)
             tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "katt")
         }
 
