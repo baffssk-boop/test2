@@ -50,6 +50,9 @@ class MainActivity : AppCompatActivity() {
     private var source: MotionSource? = null
     private var sensorStatus = "Ingen sensor vald"
     private var lastMotion = 0L
+    private var motionMutedUntil = 0L
+    private var peakLevel = 0f
+    private var shownLevel = 0f
     private var tab = 0
 
     private lateinit var content: LinearLayout
@@ -74,6 +77,8 @@ class MainActivity : AppCompatActivity() {
     private val ticker = object : Runnable {
         override fun run() {
             checkIdle()
+            shownLevel = peakLevel
+            peakLevel = 0f
             updateOverview()
             handler.postDelayed(this, 1000)
         }
@@ -130,7 +135,9 @@ class MainActivity : AppCompatActivity() {
         stopSource()
         lastMotion = System.currentTimeMillis()
         source = when (store.sensorType) {
-            "phone" -> PhoneMotionSource(this, { store.phoneSensitivity }, ::onMotion, ::onSensorStatus)
+            "phone" -> PhoneMotionSource(this, { store.phoneSensitivity }, ::onMotion, ::onSensorStatus) {
+                if (it > peakLevel) peakLevel = it
+            }
             "ble" -> {
                 val addr = store.bleAddress
                 when {
@@ -166,6 +173,8 @@ class MainActivity : AppCompatActivity() {
     /** Anropas när sensorn känner rörelse. Avslutar ett pågående sensorstopp. */
     private fun onMotion() {
         val now = System.currentTimeMillis()
+        // Telefonens egen vibration ska inte räknas som att maskinen startat
+        if (now < motionMutedUntil) return
         lastMotion = now
         val s = store.shift ?: return
         if (s.end != null) return
@@ -337,10 +346,19 @@ class MainActivity : AppCompatActivity() {
         }
         ovSensor?.text = if (source != null) {
             val ago = (now - lastMotion) / 1000
-            "Sensor: $sensorName · $sensorStatus\nSenaste rörelse för $ago s sedan · stopp efter ${store.thresholdSec} s"
+            val left = maxOf(0L, store.thresholdSec - ago)
+            buildString {
+                append("Sensor: $sensorName · $sensorStatus\n")
+                if (store.sensorType == "phone") {
+                    append("Rörelse nu: ${String.format(sv, "%.2f", shownLevel)} m/s² (gräns ${num(store.phoneSensitivity.toDouble())})\n")
+                }
+                if (open == null) append("Ingen rörelse på $ago s · stopp om $left s")
+                else append("Senaste rörelse för $ago s sedan")
+            }
         } else {
-            "Sensor: $sensorName · $sensorStatus"
+            "Automatiska stopp är AV.\nVälj en sensor under Inställningar."
         }
+        ovSensor?.setTextColor(if (source != null) grey else red)
     }
 
     private fun renderStops() {
@@ -801,6 +819,7 @@ class MainActivity : AppCompatActivity() {
     private fun toast(s: String) = Toast.makeText(this, s, Toast.LENGTH_SHORT).show()
 
     private fun vibrate() {
+        motionMutedUntil = System.currentTimeMillis() + 1500
         try {
             @Suppress("DEPRECATION")
             val v = getSystemService(VIBRATOR_SERVICE) as? Vibrator ?: return

@@ -34,6 +34,7 @@ class PhoneMotionSource(
     private val sensitivity: () -> Float,
     private val onMotion: () -> Unit,
     private val onStatus: (String) -> Unit,
+    private val onLevel: (Float) -> Unit = {},
 ) : MotionSource, SensorEventListener {
 
     private val sm = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -66,7 +67,9 @@ class PhoneMotionSource(
         val x = e.values[0] - gravity[0]
         val y = e.values[1] - gravity[1]
         val z = e.values[2] - gravity[2]
-        if (sqrt(x * x + y * y + z * z) > sensitivity()) onMotion()
+        val level = sqrt(x * x + y * y + z * z)
+        onLevel(level)
+        if (level > sensitivity()) onMotion()
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
