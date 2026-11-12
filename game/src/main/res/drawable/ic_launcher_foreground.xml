@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tre hexagoner i spelarfärger -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path android:fillColor="#E5484D"
+        android:pathData="M42,30 L52,35.8 L52,47.3 L42,53 L32,47.3 L32,35.8 Z" />
+    <path android:fillColor="#3E8BFF"
+        android:pathData="M64,30 L74,35.8 L74,47.3 L64,53 L54,47.3 L54,35.8 Z" />
+    <path android:fillColor="#F2B53A"
+        android:pathData="M53,49 L63,54.8 L63,66.3 L53,72 L43,66.3 L43,54.8 Z" />
+</vector>

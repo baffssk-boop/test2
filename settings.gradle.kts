@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "OEE"
 include(":app")
+include(":game")

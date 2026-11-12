@@ -23,23 +23,27 @@ jobs:
         with:
           gradle-version: "8.9"
 
-      - name: Bygg appen
-        run: gradle :app:assembleDebug --no-daemon --stacktrace
+      - name: Bygg apparna
+        run: gradle :app:assembleDebug :game:assembleDebug --no-daemon --stacktrace
 
-      - name: Döp om APK-filen
-        run: cp app/build/outputs/apk/debug/app-debug.apk OEE-raknare.apk
+      - name: Döp om APK-filerna
+        run: |
+          cp app/build/outputs/apk/debug/app-debug.apk OEE-raknare.apk
+          cp game/build/outputs/apk/debug/game-debug.apk Kartkriget.apk
 
-      - name: Spara som byggartefakt
+      - name: Spara som byggartefakter
         uses: actions/upload-artifact@v4
         with:
-          name: OEE-raknare
-          path: OEE-raknare.apk
+          name: appar
+          path: |
+            OEE-raknare.apk
+            Kartkriget.apk
 
       - name: Publicera som release (lätt att ladda ner från telefonen)
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "build-${{ github.run_number }}" OEE-raknare.apk \
-            --title "OEE-räknare, bygge ${{ github.run_number }}" \
-            --notes "Ladda ner OEE-raknare.apk och öppna den på din Android för att installera." \
+          gh release create "build-${{ github.run_number }}" OEE-raknare.apk Kartkriget.apk \
+            --title "Bygge ${{ github.run_number }}" \
+            --notes "Ladda ner Kartkriget.apk eller OEE-raknare.apk och öppna filen på din Android för att installera." \
             --latest
