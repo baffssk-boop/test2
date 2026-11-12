@@ -1,0 +1,539 @@
+<title>Isabellas Kattäventyr</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Lexend:wght@400;500;600&display=swap">
+<style>
+/* Layout: one centered column app, big chunky "squishy" buttons; reading text large in Lexend */
+:root{
+  --bg:#F3EEFF; --surface:#FFFFFF; --ink:#2A2340; --muted:#6B6385; --line:#E2DAF5;
+  --accent:#FF6F9F; --accent-deep:#D94B7C; --mint:#4FC3A8; --mint-deep:#2E9B82;
+  --sun:#FFC93C; --good:#2FA866; --soft:#FFE3EE;
+  --display:"Baloo 2", "Comic Sans MS", system-ui, sans-serif;
+  --read:"Lexend", "Verdana", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1B1730; --surface:#2A2444; --ink:#F5F1FF; --muted:#B6ADD3; --line:#3E365F;
+  --accent:#FF86B0; --accent-deep:#C94F7C; --mint:#5DD4B8; --mint-deep:#2F9A82;
+  --sun:#FFD25C; --good:#4CC584; --soft:#45304A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1B1730; --surface:#2A2444; --ink:#F5F1FF; --muted:#B6ADD3; --line:#3E365F;
+  --accent:#FF86B0; --accent-deep:#C94F7C; --mint:#5DD4B8; --mint-deep:#2F9A82;
+  --sun:#FFD25C; --good:#4CC584; --soft:#45304A; color-scheme:dark}
+
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--read);font-size:18px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 40px}
+.app{max-width:620px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);line-height:1.1;margin:0;text-wrap:balance}
+h1{font-size:2.3rem;font-weight:800}
+h2{font-size:1.7rem;font-weight:800}
+p{margin:0}
+.view{display:flex;flex-direction:column;gap:18px}
+
+/* chunky squishy buttons */
+.btn{font-family:var(--display);font-weight:800;font-size:1.35rem;border:0;cursor:pointer;color:#fff;
+  background:var(--accent);border-radius:24px;padding:14px 22px;box-shadow:0 6px 0 var(--accent-deep);
+  transition:transform .08s, box-shadow .08s;touch-action:manipulation}
+.btn:active{transform:translateY(5px);box-shadow:0 1px 0 var(--accent-deep)}
+.btn.mint{background:var(--mint);box-shadow:0 6px 0 var(--mint-deep)}
+.btn.mint:active{box-shadow:0 1px 0 var(--mint-deep)}
+.btn.plain{background:var(--surface);color:var(--ink);box-shadow:0 5px 0 var(--line);border:2px solid var(--line)}
+.btn.small{font-size:1.05rem;padding:9px 16px;border-radius:18px}
+.btn:focus-visible,.pic:focus-visible,.w:focus-visible,.link:focus-visible{outline:4px solid var(--sun);outline-offset:3px}
+.link{background:none;border:0;color:var(--muted);font-family:var(--read);font-size:.95rem;text-decoration:underline;cursor:pointer;padding:6px}
+
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.chip{font-family:var(--display);font-weight:800;background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:4px 14px;font-size:1.05rem;white-space:nowrap}
+
+/* home */
+.hero{background:var(--surface);border-radius:32px;padding:22px 18px 18px;display:flex;flex-direction:column;align-items:center;gap:10px;border:2px solid var(--line)}
+.cat{width:min(230px,62vw);cursor:pointer}
+.cat.bounce{animation:boing .5s}
+.bubble{background:var(--soft);border-radius:22px;padding:12px 18px;font-size:1.2rem;text-align:center;max-width:30ch}
+.menu{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.menu .btn{width:100%}
+.menu .wide{grid-column:1/-1;font-size:1.6rem;padding:18px}
+
+/* mission */
+.paws{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.paw{width:30px;height:30px;border-radius:50%;background:var(--line);display:grid;place-items:center;font-size:16px;transition:background .3s}
+.paw.done{background:var(--mint)}
+.paw.now{background:var(--sun)}
+.card{background:var(--surface);border-radius:28px;padding:22px 18px;border:2px solid var(--line);display:flex;flex-direction:column;gap:18px}
+.ask{font-family:var(--display);font-weight:800;font-size:1.3rem;color:var(--muted)}
+.read{font-size:1.75rem;line-height:1.6;letter-spacing:.02em;word-spacing:.12em}
+.read.big{font-size:2.6rem;text-align:center;font-weight:600}
+.w{font:inherit;color:inherit;background:none;border:0;padding:0 2px;border-radius:8px;cursor:pointer;letter-spacing:inherit}
+.w:hover{background:var(--soft)}
+.w.lit{background:var(--sun);color:#2A2340}
+.say{align-self:flex-start}
+.pics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.pic{aspect-ratio:1;max-width:100%;font-size:clamp(2.6rem,12vw,4.2rem);background:var(--bg);border:3px solid var(--line);border-radius:24px;cursor:pointer;display:grid;place-items:center;transition:transform .1s}
+.pic:active{transform:scale(.94)}
+.pic.right{border-color:var(--good);background:color-mix(in srgb,var(--good) 18%,var(--surface))}
+.pic.wrong{animation:wobble .4s}
+.pic.hint{border-color:var(--sun);border-style:dashed}
+.feedback{font-family:var(--display);font-weight:800;font-size:1.4rem;min-height:1.6em}
+.feedback.good{color:var(--good)}
+.feedback.try{color:var(--accent-deep)}
+.explain{background:var(--soft);border-radius:20px;padding:14px 16px}
+.explain .read{font-size:1.4rem}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.do-emoji{font-size:5rem;text-align:center}
+
+/* drawing */
+.padwrap{width:100%;border-radius:20px;overflow:hidden;border:3px solid var(--line);background:#fff}
+#pad{display:block;width:100%;touch-action:none;cursor:crosshair}
+.colors{display:flex;gap:8px;flex-wrap:wrap}
+.col{width:40px;height:40px;border-radius:50%;border:3px solid var(--line);cursor:pointer}
+.col.sel{outline:4px solid var(--ink);outline-offset:2px}
+
+/* rewards */
+.reward{align-items:center;text-align:center}
+.sq-big{width:min(240px,64vw);cursor:pointer}
+.sq-big.squish{animation:squish .45s}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px}
+.tile{background:var(--surface);border:2px solid var(--line);border-radius:22px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
+.tile svg{width:90px;height:90px}
+.tile .nm{font-family:var(--display);font-weight:600;font-size:1rem;line-height:1.15}
+.tile.locked .nm{color:var(--muted)}
+.gal img{width:100%;border-radius:14px;border:2px solid var(--line);background:#fff}
+.empty{color:var(--muted);text-align:center;padding:30px 10px}
+
+/* grown-ups */
+.form{display:flex;flex-direction:column;gap:14px}
+label{font-weight:600;display:flex;flex-direction:column;gap:6px}
+input[type=text]{font:inherit;font-size:1.1rem;padding:10px 14px;border-radius:14px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
+.check{flex-direction:row;align-items:center;gap:10px}
+.check input{width:24px;height:24px}
+.note{color:var(--muted);font-size:.95rem}
+
+.hearts{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:20}
+.hearts span{position:absolute;bottom:-40px;font-size:30px;animation:float 1.6s ease-out forwards}
+
+@keyframes boing{30%{transform:scale(1.08,.92)}60%{transform:scale(.95,1.06)}}
+@keyframes squish{30%{transform:scale(1.25,.75)}60%{transform:scale(.9,1.1)}}
+@keyframes wobble{25%{transform:rotate(-6deg)}75%{transform:rotate(6deg)}}
+@keyframes float{to{transform:translateY(-85vh) rotate(25deg);opacity:0}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:420px){.read{font-size:1.5rem}.read.big{font-size:2.2rem}h1{font-size:1.95rem}}
+</style>
+
+<div class="app">
+
+<!-- HOME -->
+<section id="home" class="view">
+  <div class="top">
+    <h1 id="hello">Hej Isabella!</h1>
+    <span class="chip" id="countChip">0 squishies</span>
+  </div>
+  <div class="hero">
+    <div id="catHome"></div>
+    <p class="bubble" id="catSays">Mjau! Ska vi göra dagens uppdrag?</p>
+  </div>
+  <div class="menu">
+    <button class="btn wide" id="startBtn">Starta uppdrag</button>
+    <button class="btn mint" id="toCollection">Mina squishies</button>
+    <button class="btn mint" id="toGallery">Mina teckningar</button>
+  </div>
+  <div style="text-align:center"><button class="link" id="toGrown">För vuxna</button></div>
+</section>
+
+<!-- MISSION -->
+<section id="mission" class="view" hidden>
+  <div class="top">
+    <button class="btn plain small" id="quitBtn">Hem</button>
+    <div class="paws" id="paws"></div>
+  </div>
+  <div id="stage"></div>
+</section>
+
+<!-- REWARD -->
+<section id="reward" class="view reward" hidden>
+  <h1 id="rewardTitle">Bra jobbat, Isabella!</h1>
+  <p class="bubble">Du klarade dagens uppdrag. Här är din nya squishy! Tryck på den.</p>
+  <div id="rewardSq"></div>
+  <h2 id="rewardName"></h2>
+  <div class="row" style="justify-content:center">
+    <button class="btn mint" id="rewardToColl">Se alla squishies</button>
+    <button class="btn plain" id="rewardHome">Hem</button>
+  </div>
+</section>
+
+<!-- COLLECTION -->
+<section id="collection" class="view" hidden>
+  <div class="top"><h2>Mina squishies</h2><button class="btn plain small" data-home>Hem</button></div>
+  <p class="note" id="collNote"></p>
+  <div class="grid" id="collGrid"></div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery" class="view" hidden>
+  <div class="top"><h2>Mina teckningar</h2><button class="btn plain small" data-home>Hem</button></div>
+  <div class="grid gal" id="galGrid"></div>
+</section>
+
+<!-- GROWN-UPS -->
+<section id="grown" class="view" hidden>
+  <div class="top"><h2>För vuxna</h2><button class="btn plain small" data-home>Hem</button></div>
+  <div class="card form">
+    <label for="setName">Barnets namn<input type="text" id="setName" autocomplete="off"></label>
+    <label for="setCat">Kattens namn<input type="text" id="setCat" autocomplete="off"></label>
+    <label class="check" for="setVoice"><input type="checkbox" id="setVoice"> Läs upp ord och meningar</label>
+    <label for="setRate">Upplästempo<input type="range" id="setRate" min="0.6" max="1.1" step="0.05"></label>
+    <p class="note" id="voiceNote"></p>
+    <div class="row"><button class="btn mint small" id="saveSet">Spara</button><span class="note" id="savedMsg"></span></div>
+  </div>
+  <div class="card">
+    <h3>Så funkar appen</h3>
+    <p class="note">Varje uppdrag tar 5–10 minuter: tre ordbilder, två meningar att förstå, en rörelseuppgift och en rituppgift. Hon kan trycka på varje ord för att höra det. Fel svar ger en ny chans och en ledtråd, aldrig minuspoäng. Efter uppdraget får hon en squishy.</p>
+    <p class="note">Allt sparas bara i den här webbläsaren på den här enheten.</p>
+  </div>
+  <div class="card">
+    <div class="row"><button class="btn plain small" id="resetBtn">Nollställ allt</button>
+    <button class="btn small" id="resetYes" hidden>Ja, radera squishies och teckningar</button></div>
+  </div>
+</section>
+</div>
+<div class="hearts" id="hearts"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const pick=a=>a[Math.random()*a.length|0];
+
+/* ---------- saved state ---------- */
+const DEF={name:"Isabella",cat:"Blixten",voice:true,rate:0.85,owned:[],drawings:[],missions:0};
+let S={...DEF};
+try{const r=localStorage.getItem("kattapp");if(r)S={...DEF,...JSON.parse(r)}}catch(e){}
+function save(){try{localStorage.setItem("kattapp",JSON.stringify(S))}catch(e){
+  if(S.drawings.length>3){S.drawings=S.drawings.slice(-3);try{localStorage.setItem("kattapp",JSON.stringify(S))}catch(e2){}}}}
+const fill=t=>t.replaceAll("{name}",S.name).replaceAll("{cat}",S.cat);
+
+/* ---------- speech ---------- */
+let voices=[];
+function loadVoices(){try{voices=speechSynthesis.getVoices()}catch(e){}}
+try{loadVoices();speechSynthesis.onvoiceschanged=loadVoices}catch(e){}
+const NATIVE=window.AndroidTTS;
+function speak(t){
+  if(!S.voice)return;
+  if(NATIVE){try{NATIVE.speak(t,S.rate)}catch(e){}return}
+  try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="sv-SE";
+    const v=voices.find(v=>(v.lang||"").toLowerCase().startsWith("sv"));if(v)u.voice=v;
+    u.rate=S.rate;speechSynthesis.speak(u)}catch(e){}
+}
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function tappable(text){
+  return text.split(" ").map(w=>{const clean=w.replace(/[.,!?:;"]/g,"");
+    return `<button class="w" data-say="${esc(clean)}">${esc(w)}</button>`}).join(" ");
+}
+document.addEventListener("click",e=>{
+  const w=e.target.closest(".w");if(!w)return;
+  speak(w.dataset.say);w.classList.add("lit");setTimeout(()=>w.classList.remove("lit"),700);
+});
+
+/* ---------- content ---------- */
+const WORDS=[
+ {w:"igelkott",e:"🦔",s:"En igelkott har vassa taggar på ryggen."},
+ {w:"nystan",e:"🧶",s:"Ett nystan är garn som är lindat till en boll."},
+ {w:"fjäril",e:"🦋",s:"En fjäril har stora färgglada vingar."},
+ {w:"ekorre",e:"🐿️",s:"En ekorre samlar nötter inför vintern."},
+ {w:"paraply",e:"☂️",s:"Ett paraply skyddar dig mot regnet."},
+ {w:"ryggsäck",e:"🎒",s:"I en ryggsäck bär du saker på ryggen."},
+ {w:"nyckel",e:"🔑",s:"Med en nyckel kan du låsa upp en dörr."},
+ {w:"tält",e:"⛺",s:"I ett tält kan man sova ute i skogen."},
+ {w:"kompass",e:"🧭",s:"En kompass visar åt vilket håll norr är."},
+ {w:"förstoringsglas",e:"🔍",s:"Med ett förstoringsglas ser små saker större ut."},
+ {w:"sax",e:"✂️",s:"Med en sax klipper man papper."},
+ {w:"korg",e:"🧺",s:"I en korg kan man bära saker. En katt kan sova i den."},
+ {w:"vante",e:"🧤",s:"En vante håller handen varm."},
+ {w:"halsduk",e:"🧣",s:"En halsduk virar man runt halsen när det är kallt."},
+ {w:"krona",e:"👑",s:"En drottning har en krona på huvudet."},
+ {w:"pensel",e:"🖌️",s:"Med en pensel målar man med färg."},
+ {w:"regnbåge",e:"🌈",s:"En regnbåge syns när solen lyser medan det regnar."},
+ {w:"sköldpadda",e:"🐢",s:"En sköldpadda har ett hårt skal på ryggen."},
+ {w:"uggla",e:"🦉",s:"En uggla är vaken på natten."},
+ {w:"räv",e:"🦊",s:"En räv har en lång och yvig svans."},
+ {w:"bläckfisk",e:"🐙",s:"En bläckfisk har åtta armar."},
+ {w:"snigel",e:"🐌",s:"En snigel bär sitt hus på ryggen."},
+ {w:"nyckelpiga",e:"🐞",s:"En nyckelpiga är röd med svarta prickar."},
+ {w:"svamp",e:"🍄",s:"En svamp växer i skogen på hösten."},
+ {w:"kaktus",e:"🌵",s:"En kaktus har taggar och behöver lite vatten."},
+ {w:"vulkan",e:"🌋",s:"Ur en vulkan kan het lava rinna ut."},
+ {w:"raket",e:"🚀",s:"En raket flyger ut i rymden."},
+ {w:"magnet",e:"🧲",s:"En magnet drar till sig saker av järn."},
+ {w:"fyrverkeri",e:"🎆",s:"Ett fyrverkeri smäller och lyser på himlen."},
+ {w:"snögubbe",e:"⛄",s:"En snögubbe bygger man av snö."},
+ {w:"ballong",e:"🎈",s:"En ballong är fylld med luft."},
+ {w:"tandborste",e:"🪥",s:"Med en tandborste borstar du tänderna."},
+ {w:"ljus",e:"🕯️",s:"Ett ljus brinner med en liten låga."},
+ {w:"ankare",e:"⚓",s:"Ett ankare håller kvar båten på samma plats."}
+];
+const SENTS=[
+ {t:"{cat} sover i en korg.",a:"🧺",d:["🚀","🎈"]},
+ {t:"{cat} leker med ett rött nystan.",a:"🧶",d:["🔑","🍄"]},
+ {t:"{name} målar en regnbåge med en pensel.",a:"🌈",d:["🌋","⛄"]},
+ {t:"{cat} tittar på en fjäril i trädgården.",a:"🦋",d:["🐙","🐢"]},
+ {t:"När det regnar tar {name} med sig ett paraply.",a:"☂️",d:["✂️","👑"]},
+ {t:"I skogen hittar {name} en svamp under en gran.",a:"🍄",d:["🌵","🧲"]},
+ {t:"{cat} blir rädd för en igelkott med vassa taggar.",a:"🦔",d:["🦊","🐞"]},
+ {t:"På vintern bygger {name} en snögubbe.",a:"⛄",d:["🎆","⛺"]},
+ {t:"På natten sitter en uggla i trädet och tittar på {cat}.",a:"🦉",d:["🦋","🐌"]},
+ {t:"Det är kallt ute, så {name} virar något mjukt runt halsen.",a:"🧣",d:["👑","🎒"]},
+ {t:"{name} vill se en liten myra större. Vad behöver hon?",a:"🔍",d:["🧲","🪥"]},
+ {t:"{cat} vill inte bli blöt i regnet. Vad ska {name} hålla över {cat}?",a:"☂️",d:["🕯️","🧭"]},
+ {t:"{name} ska klippa ut en katt i papper. Vad behöver hon?",a:"✂️",d:["🔑","⚓"]},
+ {t:"Det är nyår och himlen lyser i många färger.",a:"🎆",d:["🌈","🌋"]},
+ {t:"Djuret har åtta armar och bor i havet.",a:"🐙",d:["🐢","🦔"]},
+ {t:"{cat} sitter i fönstret och tittar ut. Han ser en fjäril.",a:"🦋",d:["🐙","🚀"]},
+ {t:"{cat} har en lång och yvig svans, precis som ett annat djur i skogen.",a:"🦊",d:["🐌","🐢"]}
+];
+const DOS=[
+ {t:"Sträck på dig som en katt som precis har vaknat.",e:"🐈"},
+ {t:"Hoppa tre gånger som en glad kattunge.",e:"🐾"},
+ {t:"Smyg tyst som en katt runt bordet.",e:"🤫"},
+ {t:"Gör dig så stor som en Maine Coon!",e:"🦁"},
+ {t:"Snurra runt två gånger och säg mjau.",e:"🌀"},
+ {t:"Klappa händerna fem gånger.",e:"👏"},
+ {t:"Rulla ihop dig som en katt som sover.",e:"😴"},
+ {t:"Gå på alla fyra till dörren och tillbaka.",e:"🚪"}
+];
+const DRAWS=[
+ "Rita {cat} med en blå hatt.",
+ "Rita {cat} när han sitter i fönstret.",
+ "Rita {cat} med sin stora vita krage och yviga svans.",
+ "Rita en katt som leker med ett rött nystan.",
+ "Rita din egen squishy.",
+ "Rita tre fiskar som {cat} vill äta.",
+ "Rita en katt som sover i en korg.",
+ "Rita {name} och {cat} i snön.",
+ "Rita en regnbåge och en liten katt under den.",
+ "Rita en katt med en krona på huvudet."
+];
+const SQ=[
+ {id:1,n:"Rosa Kattmochi",c:"#FFB3CC",s:"cat"},
+ {id:2,n:"Mint-Mjau",c:"#9DE3CF",s:"cat"},
+ {id:3,n:"Persikabullen",c:"#FFC9A3",s:"mochi"},
+ {id:4,n:"Blåbärskatten",c:"#A9B8FF",s:"cat"},
+ {id:5,n:"Citronmochin",c:"#FFE48A",s:"mochi"},
+ {id:6,n:"Lila Hjärtat",c:"#D2B4FF",s:"heart"},
+ {id:7,n:"Jordgubbskatten",c:"#FF8C94",s:"cat",leaf:1},
+ {id:8,n:"Molnet",c:"#F2F2F7",s:"mochi"},
+ {id:9,n:"Kakaokatten",c:"#C99A73",s:"cat"},
+ {id:10,n:"Melonmochin",c:"#B6E58C",s:"mochi",leaf:1},
+ {id:11,n:"Rosa Hjärtat",c:"#FF9EC4",s:"heart"},
+ {id:12,n:"Blixten-squishy",c:"#F0CBA0",s:"cat",tufts:1}
+];
+
+/* ---------- drawings (SVG) ---------- */
+function catSVG(){return `<svg class="cat" id="catSvg" viewBox="0 0 200 210" role="img" aria-label="${esc(S.cat)}, en Maine Coon-katt">
+ <path d="M150 170 C195 160 195 105 172 92 C165 88 160 96 166 102 C180 118 172 150 140 156Z" fill="#E3B482"/>
+ <path d="M168 100 l6 6 M176 120 l8 2 M174 140 l8 -2" stroke="#D49A62" stroke-width="3.5" stroke-linecap="round"/>
+ <ellipse cx="100" cy="160" rx="58" ry="42" fill="#EBC496"/>
+ <ellipse cx="100" cy="140" rx="50" ry="38" fill="#FFF9F1"/><path d="M58 120 l-8 14 l14 -4 l-4 14 l12 -8 M142 120 l8 14 l-14 -4 l4 14 l-12 -8" fill="#FFF9F1"/>
+ <polygon points="50,74 66,16 94,56" fill="#EBC496"/><polygon points="150,74 134,16 106,56" fill="#EBC496"/>
+ <polygon points="60,64 67,32 84,56" fill="#F4B6C2"/><polygon points="140,64 133,32 116,56" fill="#F4B6C2"/>
+ <path d="M66 18 L62 2 M66 18 L70 3 M134 18 L138 2 M134 18 L130 3" stroke="#D49A62" stroke-width="3" stroke-linecap="round"/>
+ <ellipse cx="100" cy="84" rx="54" ry="45" fill="#EBC496"/>
+ <path d="M100 42 v15 M87 46 l4 13 M113 46 l-4 13" stroke="#D49A62" stroke-width="4" stroke-linecap="round"/>
+ <path d="M48 92 l14 2 M48 102 l14 -1 M152 92 l-14 2 M152 102 l-14 -1" stroke="#D49A62" stroke-width="3.5" stroke-linecap="round"/>
+ <ellipse cx="100" cy="104" rx="30" ry="19" fill="#FFF9F1"/>
+ <ellipse cx="79" cy="82" rx="10" ry="12" fill="#C2B260"/><ellipse cx="121" cy="82" rx="10" ry="12" fill="#C2B260"/>
+ <ellipse cx="79" cy="83" rx="3.5" ry="9" fill="#2A2340"/><ellipse cx="121" cy="83" rx="3.5" ry="9" fill="#2A2340"/>
+ <circle cx="82" cy="78" r="2.6" fill="#fff"/><circle cx="124" cy="78" r="2.6" fill="#fff"/>
+ <path d="M94 96 h12 l-6 7z" fill="#E88C9A"/>
+ <path d="M100 103 q-6 7 -13 2 M100 103 q6 7 13 2" stroke="#B07A4C" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+ <path d="M70 104 L36 98 M70 110 L36 114 M130 104 L164 98 M130 110 L164 114" stroke="#B9A68E" stroke-width="1.5" opacity=".6"/>
+ <ellipse cx="76" cy="198" rx="18" ry="10" fill="#FFF9F1"/><ellipse cx="124" cy="198" rx="18" ry="10" fill="#FFF9F1"/>
+</svg>`}
+
+function sqSVG(q,locked,cls=""){
+  const c=locked?"#BDB6CF":q.c, op=locked?.45:1;
+  let body;
+  if(q.s==="cat") body=`<polygon points="22,48 30,12 52,36" fill="${c}"/><polygon points="98,48 90,12 68,36" fill="${c}"/>
+    <ellipse cx="60" cy="68" rx="46" ry="40" fill="${c}"/>`;
+  else if(q.s==="heart") body=`<path d="M60 108 C10 76 8 40 32 30 C46 24 56 32 60 42 C64 32 74 24 88 30 C112 40 110 76 60 108Z" fill="${c}"/>`;
+  else body=`<ellipse cx="60" cy="70" rx="48" ry="38" fill="${c}"/>`;
+  const tufts=q.tufts?`<path d="M30 13 l-3 -9 M90 13 l3 -9" stroke="#7A4A23" stroke-width="3" stroke-linecap="round"/>`:"";
+  const leaf=q.leaf?`<path d="M60 30 c-4 -10 4 -18 14 -16 c-2 10 -8 16 -14 16z" fill="#4CB944"/>`:"";
+  const face=locked?`<text x="60" y="80" text-anchor="middle" font-size="34" font-family="Baloo 2, sans-serif" font-weight="800" fill="#fff">?</text>`:
+   `<circle cx="46" cy="66" r="5" fill="#2A2340"/><circle cx="74" cy="66" r="5" fill="#2A2340"/>
+    <circle cx="47.5" cy="64.5" r="1.6" fill="#fff"/><circle cx="75.5" cy="64.5" r="1.6" fill="#fff"/>
+    <ellipse cx="36" cy="78" rx="7" ry="4" fill="#FF7FA3" opacity=".55"/><ellipse cx="84" cy="78" rx="7" ry="4" fill="#FF7FA3" opacity=".55"/>
+    <path d="M54 76 q3 4 6 0 q3 4 6 0" stroke="#2A2340" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
+  return `<svg class="${cls}" viewBox="0 0 120 120" role="img" aria-label="${locked?"Inte hittad än":esc(q.n)}">
+    <g opacity="${op}">${body}${tufts}${leaf}</g>
+    <ellipse cx="42" cy="50" rx="10" ry="6" fill="#fff" opacity=".45"/>${face}</svg>`;
+}
+
+/* ---------- navigation ---------- */
+const VIEWS=["home","mission","reward","collection","gallery","grown"];
+function show(id){VIEWS.forEach(v=>$("#"+v).hidden=v!==id);window.scrollTo(0,0);
+  if(id==="home")renderHome();if(id==="collection")renderColl();if(id==="gallery")renderGal();if(id==="grown")renderGrown();}
+document.querySelectorAll("[data-home]").forEach(b=>b.onclick=()=>show("home"));
+
+function renderHome(){
+  $("#hello").textContent=`Hej ${S.name}!`;
+  $("#countChip").textContent=`${S.owned.length} av ${SQ.length} squishies`;
+  $("#catHome").innerHTML=catSVG();
+  const lines=S.missions===0?[`Mjau! Jag heter ${S.cat}. Ska vi göra ett uppdrag tillsammans?`]:
+    [`Mjau! Ska vi göra dagens uppdrag, ${S.name}?`,`Jag har gömt en ny squishy. Vill du hitta den?`,`Du har klarat ${S.missions} uppdrag. Wow!`];
+  const t=pick(lines);$("#catSays").textContent=t;
+  $("#catSvg").onclick=()=>{const c=$("#catSvg");c.classList.remove("bounce");void c.offsetWidth;c.classList.add("bounce");speak("Mjau! "+t)};
+}
+
+/* ---------- mission ---------- */
+let M=null;
+function newMission(){
+  const words=shuffle(WORDS).slice(0,3), sents=shuffle(SENTS).slice(0,2);
+  M={i:0,steps:[...words.map(w=>({type:"word",w})),...sents.map(s=>({type:"sent",s})),{type:"do",d:pick(DOS)},{type:"draw",t:pick(DRAWS)}]};
+  show("mission");renderStep();
+}
+function renderPaws(){
+  $("#paws").innerHTML=M.steps.map((_,i)=>`<span class="paw ${i<M.i?"done":i===M.i?"now":""}">${i<M.i?"🐾":""}</span>`).join("");
+}
+function next(){M.i++;if(M.i>=M.steps.length)finish();else renderStep()}
+function nextBtn(label="Nästa"){return `<button class="btn mint" id="nextBtn">${label}</button>`}
+
+function renderStep(){
+  renderPaws();const st=M.steps[M.i],stage=$("#stage");
+  if(st.type==="word"){
+    const opts=shuffle([st.w,...shuffle(WORDS.filter(x=>x!==st.w)).slice(0,2)]);
+    stage.innerHTML=`<div class="card">
+      <p class="ask">Läs ordet. Vilken bild är det?</p>
+      <div class="read big">${tappable(st.w.w)}</div>
+      <button class="btn plain small say" id="sayBtn">🔊 Lyssna</button>
+      <div class="pics">${opts.map(o=>`<button class="pic" data-e="${o.e}" aria-label="Bild">${o.e}</button>`).join("")}</div>
+      <p class="feedback" id="fb" aria-live="polite"></p><div id="after"></div></div>`;
+    $("#sayBtn").onclick=()=>speak(st.w.w);
+    answer(st.w.e,()=>{
+      $("#after").innerHTML=`<div class="explain"><div class="read">${tappable(st.w.s)}</div></div><div style="margin-top:16px">${nextBtn()}</div>`;
+      speak("Rätt! "+st.w.s);$("#nextBtn").onclick=next;
+    },()=>speak(st.w.w));
+  }
+  if(st.type==="sent"){
+    const text=fill(st.s.t),opts=shuffle([st.s.a,...st.s.d]);
+    stage.innerHTML=`<div class="card">
+      <p class="ask">Läs meningen. Vilken bild passar?</p>
+      <div class="read">${tappable(text)}</div>
+      <button class="btn plain small say" id="sayBtn">🔊 Lyssna på hela</button>
+      <div class="pics">${opts.map(e=>`<button class="pic" data-e="${e}" aria-label="Bild">${e}</button>`).join("")}</div>
+      <p class="feedback" id="fb" aria-live="polite"></p><div id="after"></div></div>`;
+    $("#sayBtn").onclick=()=>speak(text);
+    answer(st.s.a,()=>{$("#after").innerHTML=nextBtn();speak("Rätt!");$("#nextBtn").onclick=next},()=>speak(text));
+  }
+  if(st.type==="do"){
+    const text=fill(st.d.t);
+    stage.innerHTML=`<div class="card">
+      <p class="ask">Rörelsepaus! Läs och gör.</p>
+      <div class="do-emoji" aria-hidden="true">${st.d.e}</div>
+      <div class="read">${tappable(text)}</div>
+      <button class="btn plain small say" id="sayBtn">🔊 Lyssna</button>
+      ${nextBtn("Jag gjorde det!")}</div>`;
+    $("#sayBtn").onclick=()=>speak(text);$("#nextBtn").onclick=()=>{hearts();next()};
+  }
+  if(st.type==="draw"){
+    const text=fill(st.t);
+    stage.innerHTML=`<div class="card">
+      <p class="ask">Ritdags! Läs vad du ska rita.</p>
+      <div class="read">${tappable(text)}</div>
+      <button class="btn plain small say" id="sayBtn">🔊 Lyssna</button>
+      <div class="padwrap"><canvas id="pad"></canvas></div>
+      <div class="colors" id="colors"></div>
+      <div class="row"><button class="btn plain small" id="sizeBtn">Tjock penna</button>
+        <button class="btn plain small" id="clearBtn">Sudda allt</button></div>
+      ${nextBtn("Klar med teckningen!")}</div>`;
+    $("#sayBtn").onclick=()=>speak(text);setupPad();
+    $("#nextBtn").onclick=()=>{saveDrawing();next()};
+  }
+}
+
+function answer(right,onRight,replay){
+  let tries=0,done=false;
+  document.querySelectorAll(".pic").forEach(p=>p.onclick=()=>{
+    if(done)return;const fb=$("#fb");
+    if(p.dataset.e===right){done=true;p.classList.add("right");fb.className="feedback good";
+      fb.textContent=pick(["Rätt! Snyggt!","Ja! Du kan det här!","Superbra!","Mjau-bra!"]);hearts();onRight();}
+    else{tries++;p.classList.remove("wrong");void p.offsetWidth;p.classList.add("wrong");fb.className="feedback try";
+      if(tries===1){fb.textContent="Nästan! Lyssna en gång till.";replay()}
+      else{fb.textContent="Titta på bilden med prickad kant.";document.querySelector(`.pic[data-e="${right}"]`).classList.add("hint");replay()}}
+  });
+}
+
+/* ---------- drawing pad ---------- */
+let ctx,drawing=false,last=null,color="#2A2340",size=6;
+const COLORS=["#2A2340","#E8505B","#FF9F43","#FFD93D","#4CB944","#3A86FF","#9B5DE5","#8B5A2B","#FF8FC2","#FFFFFF"];
+function setupPad(){
+  const c=$("#pad"),w=c.parentElement.clientWidth,h=Math.round(Math.min(w*.8,440)),dpr=window.devicePixelRatio||1;
+  c.width=w*dpr;c.height=h*dpr;c.style.height=h+"px";ctx=c.getContext("2d");ctx.scale(dpr,dpr);
+  ctx.fillStyle="#fff";ctx.fillRect(0,0,w,h);ctx.lineCap="round";ctx.lineJoin="round";
+  $("#colors").innerHTML=COLORS.map(k=>`<button class="col ${k===color?"sel":""}" data-c="${k}" style="background:${k}" aria-label="Färg"></button>`).join("");
+  $("#colors").onclick=e=>{const b=e.target.closest(".col");if(!b)return;color=b.dataset.c;
+    document.querySelectorAll(".col").forEach(x=>x.classList.toggle("sel",x===b))};
+  $("#sizeBtn").onclick=()=>{size=size===6?16:6;$("#sizeBtn").textContent=size===6?"Tjock penna":"Tunn penna"};
+  $("#clearBtn").onclick=()=>{ctx.fillStyle="#fff";ctx.fillRect(0,0,w,h)};
+  const pos=e=>{const r=c.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
+  c.onpointerdown=e=>{drawing=true;last=pos(e);try{c.setPointerCapture(e.pointerId)}catch(_){}
+    ctx.fillStyle=color;ctx.beginPath();ctx.arc(last.x,last.y,size/2,0,7);ctx.fill()};
+  c.onpointermove=e=>{if(!drawing)return;const p=pos(e);ctx.strokeStyle=color;ctx.lineWidth=size;
+    ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(p.x,p.y);ctx.stroke();last=p};
+  c.onpointerup=c.onpointercancel=()=>drawing=false;
+}
+function saveDrawing(){
+  try{const c=$("#pad"),t=document.createElement("canvas"),s=Math.min(1,480/c.width);
+    t.width=c.width*s;t.height=c.height*s;t.getContext("2d").drawImage(c,0,0,t.width,t.height);
+    S.drawings.push(t.toDataURL("image/jpeg",.7));S.drawings=S.drawings.slice(-12);save()}catch(e){}
+}
+
+/* ---------- reward ---------- */
+function finish(){
+  S.missions++;
+  const left=SQ.filter(q=>!S.owned.includes(q.id));let q;
+  if(left.length){q=pick(left);S.owned.push(q.id)}else q=pick(SQ);
+  save();show("reward");
+  $("#rewardTitle").textContent=`Bra jobbat, ${S.name}!`;
+  $("#rewardSq").innerHTML=sqSVG(q,false,"sq-big");
+  $("#rewardName").textContent=left.length?q.n:`${q.n} kom på besök igen!`;
+  const el=$("#rewardSq svg");el.onclick=()=>{el.classList.remove("squish");void el.offsetWidth;el.classList.add("squish");hearts()};
+  hearts();speak(`Bra jobbat ${S.name}! Du fick ${q.n}.`);
+}
+$("#rewardToColl").onclick=()=>show("collection");$("#rewardHome").onclick=()=>show("home");
+
+function renderColl(){
+  $("#collNote").textContent=S.owned.length===SQ.length?"Du har hittat alla! Fantastiskt.":
+    `Du har hittat ${S.owned.length} av ${SQ.length}. Varje uppdrag ger en ny.`;
+  $("#collGrid").innerHTML=SQ.map(q=>{const has=S.owned.includes(q.id);
+    return `<div class="tile ${has?"":"locked"}">${sqSVG(q,!has)}<span class="nm">${has?esc(q.n):"Gömd"}</span></div>`}).join("");
+}
+function renderGal(){
+  $("#galGrid").innerHTML=S.drawings.length?[...S.drawings].reverse().map(d=>`<img src="${d}" alt="Teckning">`).join(""):
+    `<p class="empty" style="grid-column:1/-1">Här hamnar dina teckningar när du har gjort ett uppdrag.</p>`;
+}
+
+/* ---------- grown-ups ---------- */
+function renderGrown(){
+  $("#setName").value=S.name;$("#setCat").value=S.cat;$("#setVoice").checked=S.voice;$("#setRate").value=S.rate;
+  $("#savedMsg").textContent="";$("#resetYes").hidden=true;
+  let sv=voices.some(v=>(v.lang||"").toLowerCase().startsWith("sv"));if(NATIVE){try{sv=NATIVE.hasSwedish()}catch(e){}}
+  $("#voiceNote").textContent=sv?"En svensk röst finns på enheten.":"Hittar ingen svensk röst än. Uppläsningen kan låta konstig. På Android: Inställningar → Text till tal → välj Google och ladda ner svenska. På iPad/iPhone: Inställningar → Hjälpmedel → Uppläst innehåll → Röster → Svenska.";
+}
+$("#saveSet").onclick=()=>{S.name=$("#setName").value.trim()||"Isabella";S.cat=$("#setCat").value.trim()||"Blixten";
+  S.voice=$("#setVoice").checked;S.rate=parseFloat($("#setRate").value)||.85;save();$("#savedMsg").textContent="Sparat!";speak("Hej "+S.name)};
+$("#resetBtn").onclick=()=>$("#resetYes").hidden=false;
+$("#resetYes").onclick=()=>{S={...DEF,name:S.name,cat:S.cat,voice:S.voice,rate:S.rate};save();show("home")};
+
+/* ---------- fun ---------- */
+function hearts(){
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  const box=$("#hearts");for(let i=0;i<10;i++){const s=document.createElement("span");
+    s.textContent=pick(["💖","🐾","⭐","💜","🩷"]);s.style.left=(Math.random()*90+5)+"%";s.style.animationDelay=(Math.random()*.4)+"s";
+    box.appendChild(s);setTimeout(()=>s.remove(),2200)}
+}
+
+$("#startBtn").onclick=newMission;
+$("#quitBtn").onclick=()=>show("home");
+$("#toCollection").onclick=()=>show("collection");
+$("#toGallery").onclick=()=>show("gallery");
+$("#toGrown").onclick=()=>show("grown");
+show("home");
+</script>

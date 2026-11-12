@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Blixtens ansikte: krämfärgad Maine Coon med tofsar på öronen -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path android:fillColor="#EBC496" android:pathData="M30,50 L36,26 L50,40 Z" />
+    <path android:fillColor="#EBC496" android:pathData="M78,50 L72,26 L58,40 Z" />
+    <path android:fillColor="#F4B6C2" android:pathData="M35,44 L38,32 L46,40 Z" />
+    <path android:fillColor="#F4B6C2" android:pathData="M73,44 L70,32 L62,40 Z" />
+    <path android:strokeColor="#D49A62" android:strokeWidth="2" android:strokeLineCap="round"
+        android:pathData="M36,26 L34,19 M72,26 L74,19" />
+    <path android:fillColor="#EBC496" android:pathData="M28,58 A26,23 0 1,0 80,58 A26,23 0 1,0 28,58 Z" />
+    <path android:fillColor="#FFF9F1" android:pathData="M38,68 A16,10 0 1,0 70,68 A16,10 0 1,0 38,68 Z" />
+    <path android:fillColor="#C2B260" android:pathData="M38,56 A5,6 0 1,0 48,56 A5,6 0 1,0 38,56 Z" />
+    <path android:fillColor="#C2B260" android:pathData="M60,56 A5,6 0 1,0 70,56 A5,6 0 1,0 60,56 Z" />
+    <path android:fillColor="#2A2340" android:pathData="M41.5,56 A1.5,4.5 0 1,0 44.5,56 A1.5,4.5 0 1,0 41.5,56 Z" />
+    <path android:fillColor="#2A2340" android:pathData="M63.5,56 A1.5,4.5 0 1,0 66.5,56 A1.5,4.5 0 1,0 63.5,56 Z" />
+    <path android:fillColor="#E88C9A" android:pathData="M51,63 L57,63 L54,66.5 Z" />
+</vector>

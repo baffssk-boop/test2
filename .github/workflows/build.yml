@@ -24,12 +24,13 @@ jobs:
           gradle-version: "8.9"
 
       - name: Bygg apparna
-        run: gradle :app:assembleDebug :game:assembleDebug --no-daemon --stacktrace
+        run: gradle :app:assembleDebug :game:assembleDebug :katt-app:assembleDebug --no-daemon --stacktrace
 
       - name: Döp om APK-filerna
         run: |
           cp app/build/outputs/apk/debug/app-debug.apk OEE-raknare.apk
           cp game/build/outputs/apk/debug/game-debug.apk Kartkriget.apk
+          cp katt-app/build/outputs/apk/debug/katt-app-debug.apk Kattaventyr.apk
 
       - name: Spara som byggartefakter
         uses: actions/upload-artifact@v4
@@ -38,12 +39,13 @@ jobs:
           path: |
             OEE-raknare.apk
             Kartkriget.apk
+            Kattaventyr.apk
 
       - name: Publicera som release (lätt att ladda ner från telefonen)
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "build-${{ github.run_number }}" OEE-raknare.apk Kartkriget.apk \
+          gh release create "build-${{ github.run_number }}" OEE-raknare.apk Kartkriget.apk Kattaventyr.apk \
             --title "Bygge ${{ github.run_number }}" \
-            --notes "Ladda ner Kartkriget.apk eller OEE-raknare.apk och öppna filen på din Android för att installera." \
+            --notes "Ladda ner Kattaventyr.apk, Kartkriget.apk eller OEE-raknare.apk och öppna filen på din Android för att installera." \
             --latest

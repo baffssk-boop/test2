@@ -17,3 +17,4 @@ dependencyResolutionManagement {
 rootProject.name = "OEE"
 include(":app")
 include(":game")
+include(":katt-app")

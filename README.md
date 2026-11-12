@@ -22,3 +22,9 @@ Varje gång koden ändras bygger GitHub appen automatiskt. Den färdiga filen hi
 - Tillgänglighet = gångtid / planerad produktionstid
 - Prestanda = idealcykeltid × antal producerade / gångtid
 - Kvalitet = bra / (bra + kass)
+
+# Isabellas Kattäventyr
+
+En läs- och ordapp för barn, med katten Blixten som följeslagare. Varje uppdrag har ordbilder, meningar att förstå, en rörelsepaus och ett rituppdrag, och ger en squishy att samla. Alla ord kan läsas upp med telefonens talsyntes.
+
+Installera: ladda ner `Kattaventyr.apk` under **Releases** och öppna den på telefonen. Sidan ligger i mappen `katt/`.
