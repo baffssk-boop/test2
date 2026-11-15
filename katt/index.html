@@ -90,7 +90,7 @@ p{margin:0}
 
 /* rewards */
 .reward{align-items:center;text-align:center}
-.sq-big{width:min(240px,64vw);cursor:pointer}
+.sq-big{width:min(240px,64vw)}
 .sq-big.squish{animation:squish .45s}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px}
 .tile{background:var(--surface);border:2px solid var(--line);border-radius:22px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
@@ -132,6 +132,31 @@ input[type=text]{font:inherit;font-size:1.1rem;padding:10px 14px;border-radius:1
 @keyframes moon{from{transform:translateX(100vw)}to{transform:translateX(-140px)}}
 @keyframes bob{to{transform:translateY(-7px) rotate(-5deg)}}
 @keyframes shake{20%{transform:translateX(-10px)}40%{transform:translateX(10px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.pic.opt{aspect-ratio:auto;font-family:var(--read);font-size:1.5rem;font-weight:600;color:var(--ink);padding:16px 10px;line-height:1.2}
+.line{min-height:64px;border-bottom:3px dashed var(--line);display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:1.6rem;padding-block:6px}
+.placed{background:var(--soft);border-radius:12px;padding:2px 10px;animation:boing .35s}
+.wchips{display:flex;flex-wrap:wrap;gap:10px}
+.wchip{font-family:var(--read);font-size:1.5rem;font-weight:600;background:var(--surface);color:var(--ink);border:3px solid var(--line);border-radius:18px;padding:8px 16px;cursor:pointer;box-shadow:0 4px 0 var(--line)}
+.wchip:focus-visible{outline:4px solid var(--sun);outline-offset:3px}
+.wchip.hint{border-color:var(--sun);border-style:dashed}
+.wchip.wrong{animation:wobble .4s}
+.gift{font-size:clamp(6rem,32vw,9.5rem);background:none;border:0;cursor:pointer;line-height:1.1;transform:scale(var(--k,1))}
+.gift.shaking{animation:giftshake .45s}
+.sq-reveal{animation:reveal .8s cubic-bezier(.3,1.6,.5,1)}
+.sq-big,.sq-play{touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+.sq-play{width:min(300px,72vw)}
+.rar{font-family:var(--display);font-weight:800;border-radius:999px;padding:2px 14px;font-size:1rem;background:#ECE7F7;color:#4A4266}
+.rar.r2{background:#E3D4FF;color:#5124A8}
+.rar.r3{background:#FFE7A3;color:#7A4E00}
+button.tile{font:inherit;color:inherit;cursor:pointer}
+.tile.r2{border-color:#B79CFF}
+.tile.r3{border-color:#FFC93C;background:linear-gradient(var(--surface),color-mix(in srgb,#FFC93C 25%,var(--surface)))}
+#play{position:fixed;inset:0;z-index:40;background:color-mix(in srgb,var(--bg) 95%,transparent);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:env(safe-area-inset-top,0px) env(safe-area-inset-bottom,0px)}
+#play[hidden]{display:none}
+@keyframes giftshake{0%{transform:scale(var(--k)) rotate(0)}20%{transform:scale(calc(var(--k)*1.1)) rotate(-14deg)}45%{transform:scale(var(--k)) rotate(12deg)}70%{transform:rotate(-8deg) scale(var(--k))}100%{transform:scale(var(--k)) rotate(0)}}
+@keyframes reveal{from{transform:scale(0) rotate(-40deg)}to{transform:scale(1) rotate(0)}}
 @keyframes boing{30%{transform:scale(1.08,.92)}60%{transform:scale(.95,1.06)}}
 @keyframes squish{30%{transform:scale(1.25,.75)}60%{transform:scale(.9,1.1)}}
 @keyframes wobble{25%{transform:rotate(-6deg)}75%{transform:rotate(6deg)}}
@@ -172,10 +197,11 @@ input[type=text]{font:inherit;font-size:1.1rem;padding:10px 14px;border-radius:1
 <!-- REWARD -->
 <section id="reward" class="view reward" hidden>
   <h1 id="rewardTitle">Bra jobbat, Isabella!</h1>
-  <p class="bubble">Du klarade dagens uppdrag. Här är din nya squishy! Tryck på den.</p>
+  <p class="bubble" id="rewardMsg"></p>
   <div id="rewardSq"></div>
   <h2 id="rewardName"></h2>
-  <div class="row" style="justify-content:center">
+  <span class="rar" id="rewardRar" hidden></span>
+  <div class="row" id="rewardBtns" style="justify-content:center">
     <button class="btn mint" id="rewardToColl">Se alla squishies</button>
     <button class="btn plain" id="rewardHome">Hem</button>
   </div>
@@ -216,7 +242,7 @@ input[type=text]{font:inherit;font-size:1.1rem;padding:10px 14px;border-radius:1
   </div>
   <div class="card">
     <h3>Så funkar appen</h3>
-    <p class="note">Varje uppdrag tar 5–10 minuter: tre ordbilder, två meningar att förstå, en rörelseuppgift och en rituppgift. Hon kan trycka på ett enskilt ord för att höra det, men hela meningar läses inte upp, så hon får läsa själv. Fel svar ger en ny chans och en ledtråd, aldrig minuspoäng. Efter uppdraget får hon en squishy.</p>
+    <p class="note">Varje uppdrag tar 5–10 minuter: två ordbilder, en mening att förstå, två slumpade spel (gåta, bygg en mening, sant eller falskt, udda ordet eller rim), en rörelsepaus och en rituppgift. Hon kan trycka på ett enskilt ord för att höra det, men hela meningar läses inte upp, så hon får läsa själv. Fel svar ger en ny chans och en ledtråd, aldrig minuspoäng. Efter uppdraget öppnar hon ett paket med en squishy. Det finns 44 att samla, och de legendariska är ovanligare.</p>
     <p class="note">Allt sparas bara i den här webbläsaren på den här enheten.</p>
   </div>
   <div class="card">
@@ -227,6 +253,13 @@ input[type=text]{font:inherit;font-size:1.1rem;padding:10px 14px;border-radius:1
 </div>
 <div class="hearts" id="hearts"></div>
 <canvas id="confetti" hidden></canvas>
+<div id="play" hidden>
+  <div id="playSq"></div>
+  <h2 id="playName"></h2>
+  <span class="rar" id="playRar"></span>
+  <p class="note">Tryck, kläm och dra!</p>
+  <button class="btn mint" id="playClose">Klar</button>
+</div>
 
 <script>
 const $=s=>document.querySelector(s);
@@ -298,7 +331,47 @@ const WORDS=[
  {w:"ballong",e:"🎈",s:"En ballong är fylld med luft."},
  {w:"tandborste",e:"🪥",s:"Med en tandborste borstar du tänderna."},
  {w:"ljus",e:"🕯️",s:"Ett ljus brinner med en liten låga."},
- {w:"ankare",e:"⚓",s:"Ett ankare håller kvar båten på samma plats."}
+ {w:"ankare",e:"⚓",s:"Ett ankare håller kvar båten på samma plats."},
+ {w:"pingvin",e:"🐧",s:"En pingvin är en fågel som inte kan flyga, men den simmar fort."},
+ {w:"delfin",e:"🐬",s:"En delfin bor i havet och är jättesmart."},
+ {w:"bäver",e:"🦫",s:"En bäver gnager ner träd med sina stora tänder."},
+ {w:"fladdermus",e:"🦇",s:"En fladdermus sover upp och ner på dagen."},
+ {w:"kamel",e:"🐫",s:"En kamel kan gå länge i öknen utan att dricka."},
+ {w:"giraff",e:"🦒",s:"En giraff har en jättelång hals."},
+ {w:"papegoja",e:"🦜",s:"En papegoja kan lära sig att säga ord."},
+ {w:"hummer",e:"🦞",s:"En hummer har två stora klor."},
+ {w:"spindel",e:"🕷️",s:"En spindel spinner ett nät för att fånga flugor."},
+ {w:"bikupa",e:"🐝",s:"Bin bor i en bikupa och gör honung."},
+ {w:"mössa",e:"🧢",s:"En mössa har man på huvudet."},
+ {w:"stövlar",e:"🥾",s:"Med stövlar på fötterna kan du gå i lera."},
+ {w:"glasögon",e:"👓",s:"Med glasögon kan man se bättre."},
+ {w:"klocka",e:"⏰",s:"En klocka visar vad tiden är."},
+ {w:"hammare",e:"🔨",s:"Med en hammare slår man i spikar."},
+ {w:"stege",e:"🪜",s:"På en stege kan man klättra upp högt."},
+ {w:"ficklampa",e:"🔦",s:"En ficklampa lyser när det är mörkt."},
+ {w:"kudde",e:"🛏️",s:"På en kudde vilar man huvudet när man sover."},
+ {w:"pussel",e:"🧩",s:"Ett pussel lägger man bit för bit."},
+ {w:"trumma",e:"🥁",s:"På en trumma slår man med pinnar så att det låter bom."},
+ {w:"gitarr",e:"🎸",s:"En gitarr har strängar som man spelar på."},
+ {w:"tärning",e:"🎲",s:"En tärning har sex sidor med prickar."},
+ {w:"drake",e:"🪁",s:"En drake flyger högt när det blåser."},
+ {w:"pannkaka",e:"🥞",s:"En pannkaka steker man i en stekpanna."},
+ {w:"jordgubbe",e:"🍓",s:"En jordgubbe är röd och söt och växer på sommaren."},
+ {w:"citron",e:"🍋",s:"En citron är gul och smakar surt."},
+ {w:"morot",e:"🥕",s:"En morot är orange och växer i jorden."},
+ {w:"ost",e:"🧀",s:"Ost görs av mjölk och har ibland hål."},
+ {w:"munk",e:"🍩",s:"En munk är ett sött bakverk som ofta har ett hål i mitten."},
+ {w:"glass",e:"🍦",s:"Glass är kallt och gott på sommaren."},
+ {w:"fyrtorn",e:"🗼",s:"Ett fyrtorn lyser för att båtar ska hitta rätt i mörkret."},
+ {w:"helikopter",e:"🚁",s:"En helikopter har en propeller på taket."},
+ {w:"tåg",e:"🚂",s:"Ett tåg åker på räls."},
+ {w:"planet",e:"🪐",s:"Saturnus är en planet med ringar runt sig."},
+ {w:"blixt",e:"⚡",s:"En blixt lyser på himlen när det åskar."},
+ {w:"moln",e:"☁️",s:"Ett moln är vitt och svävar på himlen."},
+ {w:"snöflinga",e:"❄️",s:"En snöflinga är liten, kall och vit."},
+ {w:"diamant",e:"💎",s:"En diamant är en sten som glittrar."},
+ {w:"brev",e:"✉️",s:"Ett brev skickar man med posten."},
+ {w:"present",e:"🎁",s:"En present får man på sin födelsedag."}
 ];
 const SENTS=[
  {t:"{cat} sover i en korg.",a:"🧺",d:["🚀","🎈"]},
@@ -317,7 +390,84 @@ const SENTS=[
  {t:"Det är nyår och himlen lyser i många färger.",a:"🎆",d:["🌈","🌋"]},
  {t:"Djuret har åtta armar och bor i havet.",a:"🐙",d:["🐢","🦔"]},
  {t:"{cat} sitter i fönstret och tittar ut. Han ser en fjäril.",a:"🦋",d:["🐙","🚀"]},
- {t:"{cat} har en lång och yvig svans, precis som ett annat djur i skogen.",a:"🦊",d:["🐌","🐢"]}
+ {t:"{cat} har en lång och yvig svans, precis som ett annat djur i skogen.",a:"🦊",d:["🐌","🐢"]},
+ {t:"Strömmen har gått och det är mörkt. {name} letar efter något som lyser.",a:"🔦",d:["🧩","🥁"]},
+ {t:"{name} fyller år och får ett paket med en rosett.",a:"🎁",d:["✉️","🎲"]},
+ {t:"Det åskar ute och {cat} gömmer sig under sängen.",a:"⚡",d:["❄️","🌈"]},
+ {t:"Djuret är svart och vitt och kan inte flyga, men det simmar fort.",a:"🐧",d:["🦜","🦇"]},
+ {t:"{name} vill nå den översta hyllan. Vad behöver hon?",a:"🪜",d:["🔨","🧢"]},
+ {t:"Till frukost äter {name} något runt som man steker i en panna.",a:"🥞",d:["🍋","🧀"]},
+ {t:"Det blåser på stranden och {name} låter något flyga högt på himlen.",a:"🪁",d:["🚂","🎸"]},
+ {t:"{cat} hör ett bom bom bom från vardagsrummet.",a:"🥁",d:["🧩","👓"]},
+ {t:"Djuret har så lång hals att det kan äta blad högt uppe i träden.",a:"🦒",d:["🐫","🦫"]},
+ {t:"{name} kan inte läsa texten. Den är för suddig utan dem.",a:"👓",d:["🧤","⏰"]},
+ {t:"Den är gul och så sur att {name} gör en grimas.",a:"🍋",d:["🍓","🥕"]},
+ {t:"I solen smälter den och rinner ner över {name}s hand.",a:"🍦",d:["🧀","🍩"]},
+ {t:"Djuret sover upp och ner i en grotta på dagen.",a:"🦇",d:["🦉","🐧"]},
+ {t:"{name} klämmer på sin squishy, men den ser ut som ett bakverk med hål.",a:"🍩",d:["🥕","🍋"]}
+];
+const RIDDLES=[
+ {t:"Jag är ett djur. Jag har taggar och sover hela vintern. Vem är jag?",a:"igelkott",d:["kanin","delfin"]},
+ {t:"Jag lyser på himlen när det åskar. Vad är jag?",a:"blixt",d:["moln","regnbåge"]},
+ {t:"Jag har fyra ben men kan inte gå. Man sitter på mig. Vad är jag?",a:"stol",d:["bord","säng"]},
+ {t:"Jag har en lång hals och prickar på kroppen. Vem är jag?",a:"giraff",d:["kamel","bäver"]},
+ {t:"Jag visar vad tiden är och kan ringa på morgonen. Vad är jag?",a:"klocka",d:["kompass","ficklampa"]},
+ {t:"Jag är kall och vit och faller från himlen på vintern. Vad är jag?",a:"snöflinga",d:["moln","regndroppe"]},
+ {t:"Jag är en fågel. Jag är vaken på natten och säger hoo hoo. Vem är jag?",a:"uggla",d:["papegoja","pingvin"]},
+ {t:"Man lägger mig bit för bit tills bilden blir hel. Vad är jag?",a:"pussel",d:["tärning","drake"]},
+ {t:"Jag är orange och växer i jorden. Kaniner gillar mig. Vad är jag?",a:"morot",d:["citron","jordgubbe"]},
+ {t:"Jag har sex sidor med prickar. Man kastar mig i spel. Vad är jag?",a:"tärning",d:["pussel","boll"]},
+ {t:"Jag spinner ett nät och har åtta ben. Vem är jag?",a:"spindel",d:["nyckelpiga","fjäril"]},
+ {t:"Jag är mjuk och man kan klämma, dra och knåda mig. Vad är jag?",a:"squishy",d:["sten","sax"]},
+ {t:"Jag har morrhår, spinner när jag är glad och säger mjau. Vem är jag?",a:"katt",d:["hund","häst"]},
+ {t:"Man har mig på foten när det är lerigt ute. Vad är jag?",a:"stövel",d:["vante","mössa"]},
+ {t:"Jag bor i havet, har två stora klor och blir röd när man kokar mig. Vem är jag?",a:"hummer",d:["delfin","bläckfisk"]}
+];
+const ORDERS=[
+ {t:"{cat} sover i korgen.",e:"🧺"},
+ {t:"Katten leker med ett nystan.",e:"🧶"},
+ {t:"{name} klämmer på en squishy.",e:"🤏"},
+ {t:"Fjärilen flyger över blommorna.",e:"🦋"},
+ {t:"Vi bygger en snögubbe i dag.",e:"⛄"},
+ {t:"{cat} äter fisk i köket.",e:"🐟"},
+ {t:"Raketen åker upp till månen.",e:"🚀"},
+ {t:"Ugglan sitter i ett högt träd.",e:"🦉"},
+ {t:"{name} ritar en glad katt.",e:"🖍️"},
+ {t:"Det regnar och blåser ute.",e:"🌧️"},
+ {t:"Pingvinen simmar i det kalla vattnet.",e:"🐧"},
+ {t:"{cat} har en stor och yvig svans.",e:"🐈"}
+];
+const TFS=[
+ {t:"Katter kan flyga.",a:false},{t:"En snögubbe är gjord av snö.",a:true},
+ {t:"En fisk bor i vatten.",a:true},{t:"Glass är varmt.",a:false},
+ {t:"{cat} säger voff.",a:false},{t:"En citron smakar surt.",a:true},
+ {t:"En spindel har tre ben.",a:false},{t:"Man kan klämma på en squishy.",a:true},
+ {t:"Solen lyser på natten.",a:false},{t:"En giraff har lång hals.",a:true},
+ {t:"Man borstar tänderna med en hammare.",a:false},{t:"En pingvin kan simma.",a:true},
+ {t:"En Maine Coon är en stor katt.",a:true},{t:"Snö är varmt och blött som te.",a:false},
+ {t:"På vintern är det ofta kallt i Sverige.",a:true},{t:"En sköldpadda springer fortare än en katt.",a:false}
+];
+const ODDS=[
+ {w:["katt","hund","häst","banan"],a:"banan"},
+ {w:["röd","blå","grön","stol"],a:"stol"},
+ {w:["äpple","päron","bil","banan"],a:"bil"},
+ {w:["vante","mössa","halsduk","gaffel"],a:"gaffel"},
+ {w:["sol","måne","stjärna","sko"],a:"sko"},
+ {w:["tåg","buss","bil","glass"],a:"glass"},
+ {w:["gitarr","trumma","piano","morot"],a:"morot"},
+ {w:["uggla","papegoja","pingvin","delfin"],a:"delfin"},
+ {w:["sax","penna","sudd","moln"],a:"moln"},
+ {w:["munk","bulle","kaka","sten"],a:"sten"},
+ {w:["ett","två","tre","hus"],a:"hus"},
+ {w:["glad","ledsen","arg","tröja"],a:"tröja"}
+];
+const RHYMES=[
+ {w:"katt",a:"hatt",d:["hund","sol"]},{w:"mus",a:"hus",d:["bil","katt"]},
+ {w:"sol",a:"stol",d:["måne","bok"]},{w:"bok",a:"kok",d:["boll","bil"]},
+ {w:"fisk",a:"disk",d:["fot","hav"]},{w:"glass",a:"tass",d:["sked","snö"]},
+ {w:"säng",a:"äng",d:["kudde","natt"]},
+ {w:"gris",a:"is",d:["ko","bonde"]},{w:"ros",a:"dos",d:["blad","träd"]},
+ {w:"ko",a:"sko",d:["kalv","gräs"]},{w:"häst",a:"fest",d:["sadel","hö"]}
 ];
 const DOS=[
  {t:"Sträck på dig som en katt som precis har vaknat.",e:"🐈"},
@@ -327,7 +477,14 @@ const DOS=[
  {t:"Snurra runt två gånger och säg mjau.",e:"🌀"},
  {t:"Klappa händerna fem gånger.",e:"👏"},
  {t:"Rulla ihop dig som en katt som sover.",e:"😴"},
- {t:"Gå på alla fyra till dörren och tillbaka.",e:"🚪"}
+ {t:"Gå på alla fyra till dörren och tillbaka.",e:"🚪"},
+ {t:"Gör en moonwalk baklänges, tre steg!",e:"🕺"},
+ {t:"Stå på ett ben och räkna till tio.",e:"🦩"},
+ {t:"Hoppa som en groda fyra gånger.",e:"🐸"},
+ {t:"Krama din mjukaste squishy eller kudde.",e:"🤗"},
+ {t:"Gå baklänges till fönstret och tillbaka.",e:"🔙"},
+ {t:"Gör tre jättestora grodhopp.",e:"💥"},
+ {t:"Dansa som en galen katt i tio sekunder!",e:"💃"}
 ];
 const DRAWS=[
  "Rita {cat} med en blå hatt.",
@@ -339,8 +496,15 @@ const DRAWS=[
  "Rita en katt som sover i en korg.",
  "Rita {name} och {cat} i snön.",
  "Rita en regnbåge och en liten katt under den.",
- "Rita en katt med en krona på huvudet."
+ "Rita en katt med en krona på huvudet.",
+ "Rita en knådboll med glitter i.",
+ "Rita en squishy som ser ut som en munk.",
+ "Rita {cat} när han dansar med hatt.",
+ "Rita en enhörning som äter glass.",
+ "Rita ditt drömrum fullt med squishies.",
+ "Rita en panda som klämmer på en squishy."
 ];
+/* r: 1 vanlig, 2 sällsynt, 3 legendarisk */
 const SQ=[
  {id:1,n:"Rosa Kattmochi",c:"#FFB3CC",s:"cat"},
  {id:2,n:"Mint-Mjau",c:"#9DE3CF",s:"cat"},
@@ -353,8 +517,43 @@ const SQ=[
  {id:9,n:"Kakaokatten",c:"#C99A73",s:"cat"},
  {id:10,n:"Melonmochin",c:"#B6E58C",s:"mochi",leaf:1},
  {id:11,n:"Rosa Hjärtat",c:"#FF9EC4",s:"heart"},
- {id:12,n:"Blixten-squishy",c:"#F0CBA0",s:"cat",tufts:1}
+ {id:12,n:"Blixten-squishy",c:"#F0CBA0",s:"cat",tufts:1,r:2},
+ {id:13,n:"Knådboll Rosa Glitter",c:"#FF8FC0",c2:"#FFE3F0",s:"doh",p:"glitter",r:2},
+ {id:14,n:"Knådboll Blåbär",c:"#6F93FF",c2:"#D3DEFF",s:"doh"},
+ {id:15,n:"Knådboll Galax",c:"#2E2370",c2:"#8A5CF0",s:"doh",p:"galax",r:3},
+ {id:16,n:"Knådboll Lava",c:"#FF5A3C",c2:"#FFD24A",s:"doh",r:2},
+ {id:17,n:"Knådboll Snöboll",c:"#E9F1FF",c2:"#FFFFFF",s:"doh",p:"glitter"},
+ {id:18,n:"Knådboll Mint",c:"#5FD6B2",c2:"#E0FFF5",s:"doh"},
+ {id:19,n:"Knådboll Regnbåge",c:"#FF8FC0",s:"doh",p:"rainbow",r:3},
+ {id:20,n:"Knådboll Mörkerglöd",c:"#9CF060",c2:"#F0FFD8",s:"doh",p:"glow",r:2},
+ {id:21,n:"Sockerbiten",c:"#F1ECFA",c2:"#FFFFFF",s:"cube"},
+ {id:22,n:"Rosa Sockerbiten",c:"#FFB3D4",c2:"#FFF0F6",s:"cube"},
+ {id:23,n:"Glittersockerbiten",c:"#B9A4FF",c2:"#F3EEFF",s:"cube",p:"glitter",r:2},
+ {id:24,n:"Knådboll Blixten",c:"#EBC496",c2:"#FFF5E8",s:"doh",ears:1,r:3},
+ {id:25,n:"Jordgubbsmunken",c:"#FF8FB8",s:"donut"},
+ {id:26,n:"Chokladmunken",c:"#7A4A2E",s:"donut"},
+ {id:27,n:"Rostbrödet",c:"#FFE7B8",s:"toast"},
+ {id:28,n:"Jordgubbsglassen",c:"#FFB3CC",s:"icecream"},
+ {id:29,n:"Mintglassen",c:"#B8F0DC",s:"icecream"},
+ {id:30,n:"Nallen",c:"#C99A73",c2:"#F1DCC0",s:"bear"},
+ {id:31,n:"Isbjörnen",c:"#FFFFFF",c2:"#E9E2F3",s:"bear"},
+ {id:32,n:"Kaninen",c:"#F7F1FA",s:"bunny"},
+ {id:33,n:"Grodan",c:"#8ED16F",s:"frog"},
+ {id:34,n:"Pandan",c:"#FFFFFF",s:"panda",r:2},
+ {id:35,n:"Stjärnan",c:"#FFD84A",s:"star"},
+ {id:36,n:"Enhörningen",c:"#FFFFFF",c2:"#C9A8FF",s:"unicorn",r:2},
+ {id:37,n:"Rosa Nallen",c:"#FFB8D2",c2:"#FFE6EF",s:"bear"},
+ {id:38,n:"Citronmunken",c:"#FFE48A",s:"donut"},
+ {id:39,n:"Lila Kaninen",c:"#D9C4FF",s:"bunny"},
+ {id:40,n:"Guldstjärnan",c:"#FFC93C",s:"star",p:"glitter",r:3},
+ {id:41,n:"Knådboll Bubbelgum",c:"#FF7AD9",c2:"#FFD6F5",s:"doh"},
+ {id:42,n:"Knådboll Havet",c:"#2BB3D9",c2:"#BDF1FF",s:"doh",p:"glitter",r:2},
+ {id:43,n:"Knådboll Persika",c:"#FFAA7A",c2:"#FFE6D6",s:"doh"},
+ {id:44,n:"Sockerbiten Regnbåge",c:"#FF8FC0",s:"cube",p:"rainbow",r:3}
 ];
+const RAR=["","Vanlig","Sällsynt ✨","Legendarisk 🌟"];
+const rar=q=>q.r||1;
+const isDoh=q=>q.s==="doh"||q.s==="cube";
 
 /* ---------- drawings (SVG) ---------- */
 function catSVG(id="catSvg",cls="cat"){return `<svg class="${cls}" id="${id}" viewBox="0 0 200 210" role="img" aria-label="${esc(S.cat)}, en Maine Coon-katt">
@@ -378,23 +577,53 @@ function catSVG(id="catSvg",cls="cat"){return `<svg class="${cls}" id="${id}" vi
  <ellipse cx="76" cy="198" rx="18" ry="10" fill="#FFF9F1"/><ellipse cx="124" cy="198" rx="18" ry="10" fill="#FFF9F1"/>
 </svg>`}
 
+function seeded(n){let x=n*7919%233280;return()=>{x=(x*9301+49297)%233280;return x/233280}}
+function sqFace(fy=0,eye="#2A2340",hi="#fff"){return `<g transform="translate(0 ${fy})">
+  <circle cx="46" cy="66" r="5" fill="${eye}"/><circle cx="74" cy="66" r="5" fill="${eye}"/>
+  <circle cx="47.5" cy="64.5" r="1.6" fill="${hi}"/><circle cx="75.5" cy="64.5" r="1.6" fill="${hi}"/>
+  <ellipse cx="36" cy="78" rx="7" ry="4" fill="#FF7FA3" opacity=".55"/><ellipse cx="84" cy="78" rx="7" ry="4" fill="#FF7FA3" opacity=".55"/>
+  <path d="M54 76 q3 4 6 0 q3 4 6 0" stroke="#2A2340" stroke-width="2.4" fill="none" stroke-linecap="round"/></g>`}
 function sqSVG(q,locked,cls=""){
-  const c=locked?"#BDB6CF":q.c, op=locked?.45:1;
-  let body;
-  if(q.s==="cat") body=`<polygon points="22,48 30,12 52,36" fill="${c}"/><polygon points="98,48 90,12 68,36" fill="${c}"/>
-    <ellipse cx="60" cy="68" rx="46" ry="40" fill="${c}"/>`;
-  else if(q.s==="heart") body=`<path d="M60 108 C10 76 8 40 32 30 C46 24 56 32 60 42 C64 32 74 24 88 30 C112 40 110 76 60 108Z" fill="${c}"/>`;
-  else body=`<ellipse cx="60" cy="70" rx="48" ry="38" fill="${c}"/>`;
-  const tufts=q.tufts?`<path d="M30 13 l-3 -9 M90 13 l3 -9" stroke="#7A4A23" stroke-width="3" stroke-linecap="round"/>`:"";
-  const leaf=q.leaf?`<path d="M60 30 c-4 -10 4 -18 14 -16 c-2 10 -8 16 -14 16z" fill="#4CB944"/>`:"";
-  const face=locked?`<text x="60" y="80" text-anchor="middle" font-size="34" font-family="Baloo 2, sans-serif" font-weight="800" fill="#fff">?</text>`:
-   `<circle cx="46" cy="66" r="5" fill="#2A2340"/><circle cx="74" cy="66" r="5" fill="#2A2340"/>
-    <circle cx="47.5" cy="64.5" r="1.6" fill="#fff"/><circle cx="75.5" cy="64.5" r="1.6" fill="#fff"/>
-    <ellipse cx="36" cy="78" rx="7" ry="4" fill="#FF7FA3" opacity=".55"/><ellipse cx="84" cy="78" rx="7" ry="4" fill="#FF7FA3" opacity=".55"/>
-    <path d="M54 76 q3 4 6 0 q3 4 6 0" stroke="#2A2340" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
-  return `<svg class="${cls}" viewBox="0 0 120 120" role="img" aria-label="${locked?"Inte hittad än":esc(q.n)}">
-    <g opacity="${op}">${body}${tufts}${leaf}</g>
-    <ellipse cx="42" cy="50" rx="10" ry="6" fill="#fff" opacity=".45"/>${face}</svg>`;
+  const L=locked, c=L?"#BDB6CF":q.c, c2=L?"#CFC9DD":(q.c2||q.c), gid="g"+q.id+cls.replace(/\W/g,"");
+  let defs="",body="",over="",face=sqFace(),shine=`<ellipse cx="42" cy="48" rx="10" ry="6" fill="#fff" opacity=".45"/>`;
+  const fillG=(q.p==="rainbow"&&!L)?`url(#${gid}r)`:`url(#${gid})`;
+  defs=`<radialGradient id="${gid}" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="${c2}"/><stop offset="1" stop-color="${c}"/></radialGradient>
+   <linearGradient id="${gid}r" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF8FB8"/><stop offset=".25" stop-color="#FFD86B"/><stop offset=".5" stop-color="#8EE6A8"/><stop offset=".75" stop-color="#7FB2FF"/><stop offset="1" stop-color="#C79BFF"/></linearGradient>`;
+  switch(q.s){
+    case "cat":body=`<polygon points="22,48 30,12 52,36" fill="${c}"/><polygon points="98,48 90,12 68,36" fill="${c}"/><ellipse cx="60" cy="68" rx="46" ry="40" fill="${c}"/>`;
+      if(q.tufts)over+=`<path d="M30 13 l-3 -9 M90 13 l3 -9" stroke="#7A4A23" stroke-width="3" stroke-linecap="round"/>`;break;
+    case "heart":body=`<path d="M60 108 C10 76 8 40 32 30 C46 24 56 32 60 42 C64 32 74 24 88 30 C112 40 110 76 60 108Z" fill="${c}"/>`;break;
+    case "doh":
+      if(q.ears)body+=`<polygon points="20,46 26,6 50,28" fill="${c}"/><polygon points="100,46 94,6 70,28" fill="${c}"/><path d="M26 7 l-3 -6 M94 7 l3 -6" stroke="#B07A4C" stroke-width="3" stroke-linecap="round"/>`;
+      if(q.p==="glow"&&!L)body+=`<circle cx="60" cy="64" r="56" fill="${c}" opacity=".25"/>`;
+      body+=`<circle cx="60" cy="64" r="48" fill="${fillG}"/>`;shine=`<ellipse cx="40" cy="40" rx="13" ry="8" fill="#fff" opacity=".6" transform="rotate(-25 40 40)"/>`;break;
+    case "cube":body=`<rect x="12" y="18" width="96" height="92" rx="28" fill="${fillG}"/>`;break;
+    case "donut":body=`<circle cx="60" cy="64" r="48" fill="${L?c:"#E9B872"}"/><path d="M16 58 C18 24 102 24 104 58 C100 66 94 60 88 68 C82 76 76 64 68 70 C60 76 54 64 46 70 C38 76 32 62 26 70 C20 74 16 66 16 58Z" fill="${c}"/><ellipse cx="60" cy="42" rx="9" ry="6" fill="${L?"#A9A2BC":"#C98B45"}"/>`;
+      if(!L){const r=seeded(q.id),cols=["#fff","#FFD84A","#7FB2FF","#8EE6A8","#FF5A8A"];for(let i=0;i<12;i++){const x=24+r()*72,y=32+r()*22;if(Math.abs(x-60)<12&&y<48)continue;over+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="7" height="2.6" rx="1.3" fill="${cols[i%5]}" transform="rotate(${(r()*180)|0} ${x.toFixed(1)} ${y.toFixed(1)})"/>`}}
+      face=sqFace(8);shine="";break;
+    case "toast":body=`<path d="M18 110 V54 C2 50 4 14 34 14 H86 C116 14 118 50 102 54 V110 Z" fill="${L?c:"#D9A15B"}"/><path d="M27 103 V50 C14 46 16 23 36 23 H84 C104 23 106 46 93 50 V103Z" fill="${c}"/>`;face=sqFace(4);break;
+    case "icecream":body=`<path d="M36 70 L60 118 L84 70Z" fill="${L?c2:"#E0A45E"}"/><path d="M42 80 h36 M48 92 h24" stroke="${L?c:"#C4843E"}" stroke-width="2.5"/><circle cx="60" cy="50" r="34" fill="${c}"/><path d="M26 56 q8 16 17 4 q9 14 17 2 q8 14 17 2 q8 12 17 -8" fill="${c}"/>`;
+      over=L?"":`<circle cx="60" cy="14" r="6" fill="#E8505B"/><path d="M60 9 q4 -8 10 -6" stroke="#4CB944" stroke-width="2" fill="none"/>`;face=sqFace(-14);shine=`<ellipse cx="44" cy="30" rx="9" ry="5" fill="#fff" opacity=".5"/>`;break;
+    case "bear":body=`<circle cx="24" cy="32" r="16" fill="${c}"/><circle cx="96" cy="32" r="16" fill="${c}"/><circle cx="24" cy="32" r="8" fill="${c2}"/><circle cx="96" cy="32" r="8" fill="${c2}"/><ellipse cx="60" cy="68" rx="48" ry="42" fill="${c}"/><ellipse cx="60" cy="80" rx="15" ry="10" fill="${c2}"/>`;break;
+    case "bunny":body=`<ellipse cx="40" cy="26" rx="11" ry="26" fill="${c}"/><ellipse cx="80" cy="26" rx="11" ry="26" fill="${c}"/><ellipse cx="40" cy="28" rx="5" ry="17" fill="${L?c2:"#FFB8CF"}"/><ellipse cx="80" cy="28" rx="5" ry="17" fill="${L?c2:"#FFB8CF"}"/><ellipse cx="60" cy="74" rx="46" ry="38" fill="${c}"/>`;face=sqFace(6);break;
+    case "frog":body=`<circle cx="36" cy="38" r="17" fill="${c}"/><circle cx="84" cy="38" r="17" fill="${c}"/><ellipse cx="60" cy="74" rx="50" ry="38" fill="${c}"/>`;
+      face=`<circle cx="36" cy="36" r="10" fill="#fff"/><circle cx="84" cy="36" r="10" fill="#fff"/><circle cx="37" cy="37" r="5" fill="#2A2340"/><circle cx="83" cy="37" r="5" fill="#2A2340"/>
+        <ellipse cx="32" cy="80" rx="7" ry="4" fill="#FF7FA3" opacity=".55"/><ellipse cx="88" cy="80" rx="7" ry="4" fill="#FF7FA3" opacity=".55"/><path d="M40 78 q20 16 40 0" stroke="#2A2340" stroke-width="2.6" fill="none" stroke-linecap="round"/>`;
+      if(L)face="";shine=`<ellipse cx="52" cy="58" rx="9" ry="5" fill="#fff" opacity=".4"/>`;break;
+    case "panda":body=`<circle cx="26" cy="32" r="15" fill="${L?c2:"#2A2340"}"/><circle cx="94" cy="32" r="15" fill="${L?c2:"#2A2340"}"/><ellipse cx="60" cy="68" rx="48" ry="42" fill="${c}"/>`+(L?"":`<ellipse cx="44" cy="64" rx="11" ry="9" fill="#2A2340" transform="rotate(-25 44 64)"/><ellipse cx="76" cy="64" rx="11" ry="9" fill="#2A2340" transform="rotate(25 76 64)"/><ellipse cx="60" cy="74" rx="4" ry="3" fill="#2A2340"/>`);
+      face=sqFace(0,"#fff","#2A2340");break;
+    case "star":body=`<polygon points="${Array.from({length:10},(_,i)=>{const a=-Math.PI/2+i*Math.PI/5,r=i%2?28:56;return (60+r*Math.cos(a)).toFixed(1)+","+(66+r*Math.sin(a)).toFixed(1)}).join(" ")}" fill="${c}" stroke="${c}" stroke-width="10" stroke-linejoin="round"/>`;face=sqFace(2);break;
+    case "unicorn":body=`<ellipse cx="60" cy="70" rx="48" ry="38" fill="${c}"/><path d="M14 64 C10 36 30 22 48 30 C36 34 30 46 32 58 C24 54 18 58 14 64Z" fill="${c2}"/>`;
+      over=`<polygon points="53,36 60,4 67,36" fill="${L?c2:"#FFD84A"}"/><path d="M55 28 l10 -3 M56 20 l8 -2" stroke="${L?c:"#E0A800"}" stroke-width="2"/>`;break;
+    default:body=`<ellipse cx="60" cy="70" rx="48" ry="38" fill="${c}"/>`;
+  }
+  if(q.leaf)over+=`<path d="M60 30 c-4 -10 4 -18 14 -16 c-2 10 -8 16 -14 16z" fill="${L?c2:"#4CB944"}"/>`;
+  if(!L&&(q.p==="glitter"||q.p==="galax")){const r=seeded(q.id+3);for(let i=0;i<(q.p==="galax"?22:18);i++){const a=r()*6.28,d=Math.sqrt(r())*40;
+    const x=60+Math.cos(a)*d,y=64+Math.sin(a)*d;over+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(r()*1.6+.8).toFixed(1)}" fill="${q.p==="galax"?"#fff":(i%3?"#fff":"#FFD84A")}" opacity=".85"/>`}}
+  if(!L&&rar(q)===3)over+=`<path d="M104 10 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3z M14 92 l2 5 l5 2 l-5 2 l-2 5 l-2 -5 l-5 -2 l5 -2z" fill="#FFD84A"/>`;
+  if(L)face=`<text x="60" y="80" text-anchor="middle" font-size="34" font-family="Baloo 2, sans-serif" font-weight="800" fill="#fff">?</text>`;
+  return `<svg class="${cls}" viewBox="0 0 120 120" role="img" aria-label="${L?"Inte hittad än":esc(q.n)}"><defs>${defs}</defs>
+    <g opacity="${L?.5:1}">${body}${over}</g>${L?"":shine}${face}</svg>`;
 }
 
 /* ---------- navigation ---------- */
@@ -415,9 +644,11 @@ function renderHome(){
 
 /* ---------- mission ---------- */
 let M=null;
+const GAMES=["riddle","order","tf","odd","rhyme"];
 function newMission(){
-  const words=shuffle(WORDS).slice(0,3), sents=shuffle(SENTS).slice(0,2);
-  M={i:0,streak:0,steps:[...words.map(w=>({type:"word",w})),...sents.map(s=>({type:"sent",s})),{type:"do",d:pick(DOS)},{type:"draw",t:pick(DRAWS)}]};
+  const words=shuffle(WORDS).slice(0,2),g=shuffle(GAMES).slice(0,2);
+  const mk=t=>t==="riddle"?{type:t,r:pick(RIDDLES)}:t==="order"?{type:t,o:pick(ORDERS)}:t==="tf"?{type:t,q:pick(TFS)}:t==="odd"?{type:t,q:pick(ODDS)}:{type:t,q:pick(RHYMES)};
+  M={i:0,streak:0,steps:[{type:"word",w:words[0]},mk(g[0]),{type:"sent",s:pick(SENTS)},{type:"do",d:pick(DOS)},{type:"word",w:words[1]},mk(g[1]),{type:"draw",t:pick(DRAWS)}]};
   show("mission");renderStep();
 }
 function renderPaws(){
@@ -425,6 +656,9 @@ function renderPaws(){
 }
 function next(){M.i++;if(M.i>=M.steps.length)finish();else renderStep()}
 function nextBtn(label="Nästa"){return `<button class="btn mint" id="nextBtn">${label}</button>`}
+const optBtns=list=>`<div class="opts">${list.map(o=>`<button class="pic opt" data-e="${esc(o)}">${esc(o)}</button>`).join("")}</div>`;
+const tail=`<p class="feedback" id="fb" aria-live="polite"></p><div id="after"></div></div>`;
+const goNext=()=>{$("#after").innerHTML=nextBtn();$("#nextBtn").onclick=next};
 
 function renderStep(){
   renderPaws();const st=M.steps[M.i],stage=$("#stage");
@@ -434,8 +668,7 @@ function renderStep(){
       <p class="ask">Läs ordet. Vilken bild är det?</p>
       <div class="read big">${tappable(st.w.w)}</div>
       <button class="btn plain small say" id="sayBtn">🔊 Lyssna</button>
-      <div class="pics">${opts.map(o=>`<button class="pic" data-e="${o.e}" aria-label="Bild">${o.e}</button>`).join("")}</div>
-      <p class="feedback" id="fb" aria-live="polite"></p><div id="after"></div></div>`;
+      <div class="pics">${opts.map(o=>`<button class="pic" data-e="${o.e}" aria-label="Bild">${o.e}</button>`).join("")}</div>${tail}`;
     $("#sayBtn").onclick=()=>speak(st.w.w);
     answer(st.w.e,()=>{
       $("#after").innerHTML=`<div class="explain"><div class="read">${tappable(st.w.s)}</div></div><div style="margin-top:16px">${nextBtn()}</div>`;
@@ -447,9 +680,59 @@ function renderStep(){
     stage.innerHTML=`<div class="card">
       <p class="ask">Läs meningen. Vilken bild passar?</p>
       <div class="read">${tappable(text)}</div>
-      <div class="pics">${opts.map(e=>`<button class="pic" data-e="${e}" aria-label="Bild">${e}</button>`).join("")}</div>
-      <p class="feedback" id="fb" aria-live="polite"></p><div id="after"></div></div>`;
-    answer(st.s.a,()=>{$("#after").innerHTML=nextBtn();$("#nextBtn").onclick=next},()=>{});
+      <div class="pics">${opts.map(e=>`<button class="pic" data-e="${e}" aria-label="Bild">${e}</button>`).join("")}</div>${tail}`;
+    answer(st.s.a,goNext);
+  }
+  if(st.type==="riddle"){
+    stage.innerHTML=`<div class="card">
+      <p class="ask">Gåta! Läs och gissa.</p>
+      <div class="read">${tappable(fill(st.r.t))}</div>
+      ${optBtns(shuffle([st.r.a,...st.r.d]))}${tail}`;
+    answer(st.r.a,goNext);
+  }
+  if(st.type==="tf"){
+    stage.innerHTML=`<div class="card">
+      <p class="ask">Sant eller falskt?</p>
+      <div class="read">${tappable(fill(st.q.t))}</div>
+      <div class="opts"><button class="pic opt" data-e="sant">👍 Sant</button><button class="pic opt" data-e="falskt">👎 Falskt</button></div>${tail}`;
+    answer(st.q.a?"sant":"falskt",goNext);
+  }
+  if(st.type==="odd"){
+    stage.innerHTML=`<div class="card">
+      <p class="ask">Vilket ord passar inte ihop med de andra?</p>
+      ${optBtns(shuffle(st.q.w))}${tail}`;
+    answer(st.q.a,goNext);
+  }
+  if(st.type==="rhyme"){
+    stage.innerHTML=`<div class="card">
+      <p class="ask">Vilket ord rimmar på</p>
+      <div class="read big">${tappable(st.q.w)}</div>
+      ${optBtns(shuffle([st.q.a,...st.q.d]))}${tail}`;
+    answer(st.q.a,goNext);
+  }
+  if(st.type==="order"){
+    const full=fill(st.o.t),target=full.replace(/[.!?]$/,"").split(" ");
+    let pool=shuffle(target.map((w,i)=>({w,i})));
+    if(pool.every((p,i)=>p.i===i))pool=[...pool.slice(1),pool[0]];
+    let pos=0,tries=0;
+    stage.innerHTML=`<div class="card">
+      <p class="ask">Bygg meningen! Tryck på orden i rätt ordning.</p>
+      <div class="do-emoji" aria-hidden="true">${st.o.e}</div>
+      <div class="line" id="line"></div>
+      <div class="wchips">${pool.map(p=>`<button class="wchip" data-w="${esc(p.w)}">${esc(p.w)}</button>`).join("")}</div>${tail}`;
+    document.querySelectorAll(".wchip").forEach(b=>b.onclick=()=>{
+      if(pos>=target.length)return;const fb=$("#fb");
+      if(b.dataset.w===target[pos]){
+        pos++;b.remove();document.querySelectorAll(".wchip.hint").forEach(x=>x.classList.remove("hint"));
+        $("#line").insertAdjacentHTML("beforeend",`<span class="placed">${esc(target[pos-1])}${pos===target.length?".":""}</span>`);
+        pop();
+        if(pos===target.length){M.streak=tries===0?M.streak+1:0;fb.className="feedback good";fb.textContent="Meningen är klar!";party(false,M.streak);goNext()}
+      }else{
+        tries++;b.classList.remove("wrong");void b.offsetWidth;b.classList.add("wrong");fb.className="feedback try";
+        fb.textContent=tries<2?"Nästan! Vilket ord kommer nu?":"Titta på ordet med prickad kant.";
+        if(tries>=2)[...document.querySelectorAll(".wchip")].find(x=>x.dataset.w===target[pos])?.classList.add("hint");
+      }
+    });
   }
   if(st.type==="do"){
     const text=fill(st.d.t);
@@ -475,7 +758,7 @@ function renderStep(){
   }
 }
 
-function answer(right,onRight,replay){
+function answer(right,onRight,replay=()=>{}){
   let tries=0,done=false;
   document.querySelectorAll(".pic").forEach(p=>p.onclick=()=>{
     if(done)return;const fb=$("#fb");
@@ -484,7 +767,7 @@ function answer(right,onRight,replay){
       fb.textContent=pick(["Rätt! Snyggt!","Ja! Du kan det här!","Superbra!","Mjau-bra!"]);party(false,M.streak);onRight();}
     else{tries++;p.classList.remove("wrong");void p.offsetWidth;p.classList.add("wrong");fb.className="feedback try";
       if(tries===1){fb.textContent="Nästan! Läs en gång till.";replay()}
-      else{fb.textContent="Titta på bilden med prickad kant.";document.querySelector(`.pic[data-e="${right}"]`).classList.add("hint");replay()}}
+      else{fb.textContent="Titta på den med prickad kant.";[...document.querySelectorAll(".pic")].find(x=>x.dataset.e===right).classList.add("hint");replay()}}
   });
 }
 
@@ -513,25 +796,67 @@ function saveDrawing(){
     S.drawings.push(t.toDataURL("image/jpeg",.7));S.drawings=S.drawings.slice(-12);save()}catch(e){}
 }
 
-/* ---------- reward ---------- */
+/* ---------- reward: mystery gift ---------- */
+function drawSquishy(){
+  const left=SQ.filter(q=>!S.owned.includes(q.id));
+  const pool=left.length?left:SQ, w={1:6,2:3,3:1};
+  let t=pool.reduce((a,q)=>a+w[rar(q)],0)*Math.random();
+  for(const q of pool){t-=w[rar(q)];if(t<=0)return{q,isNew:!!left.length}}
+  return{q:pool[0],isNew:!!left.length};
+}
 function finish(){
   S.missions++;
-  const left=SQ.filter(q=>!S.owned.includes(q.id));let q;
-  if(left.length){q=pick(left);S.owned.push(q.id)}else q=pick(SQ);
-  save();show("reward");
+  const {q,isNew}=drawSquishy();if(isNew)S.owned.push(q.id);save();
+  show("reward");
   $("#rewardTitle").textContent=`Bra jobbat, ${S.name}!`;
-  $("#rewardSq").innerHTML=sqSVG(q,false,"sq-big");
-  $("#rewardName").textContent=left.length?q.n:`${q.n} kom på besök igen!`;
-  const el=$("#rewardSq svg");el.onclick=()=>{el.classList.remove("squish");void el.offsetWidth;el.classList.add("squish");squishSound();hearts()};
-  party(true,0,`Bra jobbat ${S.name}! Du fick ${q.n}.`);
+  $("#rewardMsg").textContent="Du klarade uppdraget! Tryck på paketet tre gånger för att öppna det.";
+  $("#rewardName").textContent="";$("#rewardRar").hidden=true;$("#rewardBtns").hidden=true;
+  $("#rewardSq").innerHTML=`<button class="gift" id="gift" aria-label="Öppna paketet">🎁</button>`;
+  party(false,0);
+  let taps=0;
+  $("#gift").onclick=()=>{
+    taps++;const g=$("#gift");g.style.setProperty("--k",1+taps*.12);g.classList.remove("shaking");void g.offsetWidth;g.classList.add("shaking");boing(taps);
+    if(taps<3)return;
+    setTimeout(()=>{
+      $("#rewardSq").innerHTML=sqSVG(q,false,"sq-big sq-reveal");
+      $("#rewardName").textContent=isNew?q.n:`${q.n} kom på besök igen!`;
+      const r=$("#rewardRar");r.hidden=false;r.className="rar r"+rar(q);r.textContent=RAR[rar(q)];
+      $("#rewardMsg").textContent=isDoh(q)?"Det är en knådboll! Tryck och dra i den.":"Tryck och dra i den för att klämma!";
+      $("#rewardBtns").hidden=false;
+      makeSquishable($("#rewardSq svg"),q);
+      party(true,0,`${q.n}! ${rar(q)===3?"Legendarisk!":""}`);
+    },250);
+  };
 }
 $("#rewardToColl").onclick=()=>show("collection");$("#rewardHome").onclick=()=>show("home");
 
+/* tryck, kläm och dra i en squishy */
+function makeSquishable(el,q){
+  const stretch=isDoh(q)?1:.55;let start=null,sx=1,sy=1;
+  el.style.touchAction="none";
+  el.onpointerdown=e=>{start={x:e.clientX,y:e.clientY};el.classList.add("held");el.style.transition="transform .08s";
+    el.style.transform="scale(1.12,.86)";try{el.setPointerCapture(e.pointerId)}catch(_){};squishSound()};
+  el.onpointermove=e=>{if(!start)return;const dx=(e.clientX-start.x)/110*stretch,dy=(e.clientY-start.y)/110*stretch;
+    sx=Math.max(.6,Math.min(2.4,1+Math.abs(dx)-Math.abs(dy)*.4));sy=Math.max(.6,Math.min(2.4,1+Math.abs(dy)-Math.abs(dx)*.4));
+    el.style.transition="none";el.style.transform=`translate(${dx*25}px,${dy*25}px) scale(${sx},${sy})`};
+  const up=()=>{if(!start)return;start=null;el.classList.remove("held");el.style.transition="transform .6s cubic-bezier(.3,1.9,.5,1)";
+    el.style.transform="";isDoh(q)&&(sx>1.3||sy>1.3)?slimeSound():squishSound();if(sx>1.6||sy>1.6)hearts();sx=sy=1};
+  el.onpointerup=el.onpointercancel=up;
+}
+function openPlay(q){
+  $("#play").hidden=false;$("#playSq").innerHTML=sqSVG(q,false,"sq-play");$("#playName").textContent=q.n;
+  const r=$("#playRar");r.className="rar r"+rar(q);r.textContent=RAR[rar(q)];
+  makeSquishable($("#playSq svg"),q);
+}
+$("#playClose").onclick=()=>$("#play").hidden=true;
+
 function renderColl(){
-  $("#collNote").textContent=S.owned.length===SQ.length?"Du har hittat alla! Fantastiskt.":
-    `Du har hittat ${S.owned.length} av ${SQ.length}. Varje uppdrag ger en ny.`;
+  const n=S.owned.length;
+  $("#collNote").textContent=n===SQ.length?"Du har hittat alla! Fantastiskt.":`Du har hittat ${n} av ${SQ.length}. Tryck på en squishy för att klämma på den!`;
   $("#collGrid").innerHTML=SQ.map(q=>{const has=S.owned.includes(q.id);
-    return `<div class="tile ${has?"":"locked"}">${sqSVG(q,!has)}<span class="nm">${has?esc(q.n):"Gömd"}</span></div>`}).join("");
+    return has?`<button class="tile r${rar(q)}" data-id="${q.id}">${sqSVG(q,false)}<span class="nm">${esc(q.n)}</span></button>`:
+      `<div class="tile locked">${sqSVG(q,true)}<span class="nm">Gömd</span></div>`}).join("");
+  document.querySelectorAll("#collGrid button.tile").forEach(b=>b.onclick=()=>openPlay(SQ.find(q=>q.id==b.dataset.id)));
 }
 function renderGal(){
   $("#galGrid").innerHTML=S.drawings.length?[...S.drawings].reverse().map(d=>`<img src="${d}" alt="Teckning">`).join(""):
@@ -591,6 +916,14 @@ function chime(){const a=ac();if(!a||!S.sound)return 0;const t=a.currentTime+.02
 function squishSound(){const a=ac();if(!a||!S.sound)return;const t=a.currentTime,o=a.createOscillator(),g=a.createGain();
   o.type="sine";o.frequency.setValueAtTime(300,t);o.frequency.exponentialRampToValueAtTime(900,t+.18);
   g.gain.setValueAtTime(.25,t);g.gain.exponentialRampToValueAtTime(.001,t+.25);o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+.3)}
+function boing(n){const a=ac();if(!a||!S.sound)return;const t=a.currentTime,o=a.createOscillator(),g=a.createGain();
+  o.type="triangle";o.frequency.setValueAtTime(180+n*90,t);o.frequency.exponentialRampToValueAtTime(520+n*160,t+.15);
+  g.gain.setValueAtTime(.25,t);g.gain.exponentialRampToValueAtTime(.001,t+.3);o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+.32)}
+function pop(){const a=ac();if(!a||!S.sound)return;note(a,a.currentTime,84+((Math.random()*5)|0),.09,"sine",.18,8000)}
+function slimeSound(){const a=ac();if(!a||!S.sound)return;const t=a.currentTime;snare(a,t,0);
+  const s=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();s.buffer=NOISE;f.type="bandpass";f.Q.value=6;
+  f.frequency.setValueAtTime(300,t);f.frequency.exponentialRampToValueAtTime(1600,t+.25);g.gain.setValueAtTime(.6,t);g.gain.exponentialRampToValueAtTime(.001,t+.3);
+  s.connect(f);f.connect(g);g.connect(a.destination);s.start(t);s.stop(t+.3);squishSound()}
 const YELLS=["Hii-hii!","Ååuu!","Hii-hii!","Shamåne!"];
 function party(big=false,streak=0,after=""){
   const groovy=big||streak>=2||Math.random()<.35;
