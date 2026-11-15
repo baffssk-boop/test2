@@ -157,6 +157,13 @@ button.tile{font:inherit;color:inherit;cursor:pointer}
 #play[hidden]{display:none}
 @keyframes giftshake{0%{transform:scale(var(--k)) rotate(0)}20%{transform:scale(calc(var(--k)*1.1)) rotate(-14deg)}45%{transform:scale(var(--k)) rotate(12deg)}70%{transform:rotate(-8deg) scale(var(--k))}100%{transform:scale(var(--k)) rotate(0)}}
 @keyframes reveal{from{transform:scale(0) rotate(-40deg)}to{transform:scale(1) rotate(0)}}
+.butt{position:fixed;left:50%;bottom:calc(10px + env(safe-area-inset-bottom,0px));width:150px;margin-left:-75px;z-index:26;pointer-events:none;animation:buttin 2.6s ease-in-out forwards}
+.butt .shake{transform-origin:50% 90%;animation:twerk .16s ease-in-out infinite alternate}
+.butt .tail{transform-origin:75px 70px;animation:wag .32s ease-in-out infinite alternate}
+.butt .note{position:absolute;top:-10px;font-size:28px;animation:bob .3s infinite alternate}
+@keyframes buttin{0%{transform:translateY(180px)}12%,85%{transform:translateY(0)}100%{transform:translateY(200px)}}
+@keyframes twerk{from{transform:rotate(-7deg) translateY(0) scaleX(1.03)}to{transform:rotate(7deg) translateY(-6px) scaleX(.97)}}
+@keyframes wag{from{transform:rotate(-28deg)}to{transform:rotate(28deg)}}
 @keyframes boing{30%{transform:scale(1.08,.92)}60%{transform:scale(.95,1.06)}}
 @keyframes squish{30%{transform:scale(1.25,.75)}60%{transform:scale(.9,1.1)}}
 @keyframes wobble{25%{transform:rotate(-6deg)}75%{transform:rotate(6deg)}}
@@ -935,7 +942,9 @@ function party(big=false,streak=0,after=""){
   const pop=document.createElement("div");pop.className="pop";
   pop.innerHTML=esc(big?"MÄSTARE!":pick(["SUPER!","WOW!","GRYMT!","MJAU-BRA!","STJÄRNA!"]))+(streak>=2?`<small>${streak} i rad! 🔥</small>`:"");
   document.body.appendChild(pop);setTimeout(()=>pop.remove(),1400);
-  if(groovy){const m=document.createElement("div");m.className="moon";
+  const butt=big||Math.random()<.5;
+  if(groovy&&butt)shakeButt();
+  if(groovy&&(!butt||big)){const m=document.createElement("div");m.className="moon";
     m.innerHTML=`<span class="hat">🎩</span>${catSVG("moonCat","")}<span class="spark">✨</span>`;
     document.body.appendChild(m);setTimeout(()=>m.remove(),2500)}
 }
@@ -950,6 +959,22 @@ function confetti(n){
   (function frame(t){if(id!==confettiRun)return;g.clearRect(0,0,W,H);
     P.forEach(p=>{p.vy+=.45;p.vx*=.99;p.x+=p.vx;p.y+=p.vy;p.a+=p.va;g.save();g.translate(p.x,p.y);g.rotate(p.a);g.fillStyle=p.c;g.fillRect(-p.r,-p.r/2,p.r*2,p.r);g.restore()});
     if(t-t0<2600)requestAnimationFrame(frame);else{g.clearRect(0,0,W,H);c.hidden=true}})(t0)}
+
+function buttSVG(){return `<svg viewBox="0 0 150 150" width="150" height="150" aria-hidden="true">
+  <g class="shake">
+   <g class="tail"><path d="M75 72 C60 40 66 10 80 2 C96 -6 104 14 92 26 C84 36 82 52 82 72Z" fill="#E3B482"/>
+    <path d="M78 30 l8 -3 M80 46 l8 -2" stroke="#D49A62" stroke-width="3" stroke-linecap="round"/></g>
+   <ellipse cx="52" cy="98" rx="38" ry="36" fill="#EBC496"/><ellipse cx="98" cy="98" rx="38" ry="36" fill="#EBC496"/>
+   <path d="M75 70 V120" stroke="#D49A62" stroke-width="3" stroke-linecap="round"/>
+   <path d="M30 86 q8 -6 16 -2 M104 84 q8 -4 16 2" stroke="#D49A62" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+   <ellipse cx="44" cy="88" rx="12" ry="7" fill="#fff" opacity=".35"/><ellipse cx="90" cy="88" rx="12" ry="7" fill="#fff" opacity=".35"/>
+   <ellipse cx="48" cy="136" rx="20" ry="11" fill="#FFF9F1"/><ellipse cx="102" cy="136" rx="20" ry="11" fill="#FFF9F1"/>
+   <circle cx="40" cy="139" r="3" fill="#F4B6C2"/><circle cx="48" cy="141" r="3" fill="#F4B6C2"/><circle cx="56" cy="139" r="3" fill="#F4B6C2"/>
+   <circle cx="94" cy="139" r="3" fill="#F4B6C2"/><circle cx="102" cy="141" r="3" fill="#F4B6C2"/><circle cx="110" cy="139" r="3" fill="#F4B6C2"/>
+  </g></svg>`}
+function shakeButt(){const d=document.createElement("div");d.className="butt";
+  d.innerHTML=buttSVG()+`<span class="note" style="left:-14px">🎵</span><span class="note" style="right:-14px;animation-delay:.15s">🎶</span>`;
+  document.body.appendChild(d);setTimeout(()=>d.remove(),2700)}
 
 /* ---------- fun ---------- */
 function hearts(){
