@@ -166,6 +166,28 @@ button.tile{font:inherit;color:inherit;cursor:pointer}
 @keyframes wag{from{transform:rotate(-28deg)}to{transform:rotate(28deg)}}
 .hb{position:fixed;z-index:45;font-size:28px;pointer-events:none;transform:translate(-50%,-50%);animation:hb 1.1s ease-out forwards}
 @keyframes hb{0%{transform:translate(-50%,-50%) scale(.3);opacity:1}25%{transform:translate(calc(-50% + var(--dx)*.5),calc(-50% + var(--dy)*.5)) scale(1.3)}100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.9);opacity:0}}
+.blank{display:inline-block;min-width:1.2em;border-bottom:4px solid var(--accent);color:var(--accent);text-align:center;padding-inline:4px}
+.blank.filled{color:var(--good);border-color:var(--good)}
+.opts.letters .pic.opt{font-size:2.4rem;padding:10px}
+.read.story{font-size:1.45rem}
+.ask.question{color:var(--ink);font-size:1.4rem}
+.btn.xmas{background:#D63A4A;box-shadow:0 6px 0 #1F7A47;position:relative}
+.btn.xmas:active{box-shadow:0 1px 0 #1F7A47}
+.btn.xmas .badge{position:absolute;top:-10px;right:-6px;background:var(--sun);color:#2A2340;font-size:.9rem;border-radius:999px;padding:2px 10px;animation:bob .5s infinite alternate}
+.doors{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.door{aspect-ratio:1;max-width:100%;border:0;border-radius:18px;font-family:var(--display);font-weight:800;font-size:clamp(1.3rem,6vw,1.9rem);color:#fff;cursor:pointer;position:relative;box-shadow:0 5px 0 rgba(0,0,0,.25);display:grid;place-items:center;padding:0;overflow:hidden}
+.door.c0{background:#D63A4A}.door.c1{background:#2E9B5A}.door.c2{background:#E9B320;color:#3A2A00}
+.door.locked{filter:saturate(.55) brightness(.92)}
+.door.locked::after{content:"🔒";position:absolute;right:4px;bottom:2px;font-size:.8rem}
+.door.ready{outline:4px solid var(--sun);outline-offset:2px;animation:wobble 1.2s infinite}
+.door.open{background:var(--surface);border:2px solid var(--line);box-shadow:none}
+.door.open svg{width:86%;height:86%}
+.door.open .dnum{position:absolute;left:6px;top:2px;font-size:.85rem;color:var(--muted)}
+.door.wrong{animation:shake .35s}
+.snow{position:fixed;top:-20px;z-index:23;pointer-events:none;color:#fff;text-shadow:0 0 3px #9ED6FF;animation:snowfall linear forwards}
+@keyframes snowfall{to{transform:translateY(110vh) translateX(30px)}}
+.xhead{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tile svg,.sq-big,.sq-play,.door.open svg{filter:drop-shadow(0 1.5px 1.5px rgba(70,50,120,.28))}
 @keyframes boing{30%{transform:scale(1.08,.92)}60%{transform:scale(.95,1.06)}}
 @keyframes squish{30%{transform:scale(1.25,.75)}60%{transform:scale(.9,1.1)}}
 @keyframes wobble{25%{transform:rotate(-6deg)}75%{transform:rotate(6deg)}}
@@ -188,6 +210,7 @@ button.tile{font:inherit;color:inherit;cursor:pointer}
   </div>
   <div class="menu">
     <button class="btn wide" id="startBtn">Starta uppdrag</button>
+    <button class="btn xmas wide" id="toAdvent">🎄 Julkalender</button>
     <button class="btn mint" id="toCollection">Mina squishies</button>
     <button class="btn mint" id="toGallery">Mina teckningar</button>
   </div>
@@ -221,12 +244,22 @@ button.tile{font:inherit;color:inherit;cursor:pointer}
   <div class="top"><h2>Mina squishies</h2><button class="btn plain small" data-home>Hem</button></div>
   <p class="note" id="collNote"></p>
   <div class="grid" id="collGrid"></div>
+  <div class="xhead"><h2>🎄 Julsamling</h2><span class="note" id="xNote"></span></div>
+  <div class="grid" id="xGrid"></div>
 </section>
 
 <!-- GALLERY -->
 <section id="gallery" class="view" hidden>
   <div class="top"><h2>Mina teckningar</h2><button class="btn plain small" data-home>Hem</button></div>
   <div class="grid gal" id="galGrid"></div>
+</section>
+
+<!-- ADVENT -->
+<section id="advent" class="view" hidden>
+  <div class="top"><h2>🎄 Julkalender</h2><button class="btn plain small" data-home>Hem</button></div>
+  <p class="bubble" id="advMsg"></p>
+  <div class="doors" id="doors"></div>
+  <div id="advStage" hidden></div>
 </section>
 
 <!-- PIN -->
@@ -251,7 +284,7 @@ button.tile{font:inherit;color:inherit;cursor:pointer}
   </div>
   <div class="card">
     <h3>Så funkar appen</h3>
-    <p class="note">Varje uppdrag tar 5–10 minuter: två ordbilder, en mening att förstå, två slumpade spel (gåta, bygg en mening, sant eller falskt, udda ordet eller rim), en rörelsepaus och en rituppgift. Hon kan trycka på ett enskilt ord för att höra det, men hela meningar läses inte upp, så hon får läsa själv. Fel svar ger en ny chans och en ledtråd, aldrig minuspoäng. Ord, frågor och rituppdrag väljs så att hon inte får samma igen förrän allt i listan är använt, och ritidéerna byggs ihop slumpvis så att det finns hundratals. Efter uppdraget öppnar hon ett paket med en squishy. Det finns 44 att samla, och de legendariska är ovanligare.</p>
+    <p class="note">Varje uppdrag tar 5–10 minuter: två ordbilder, en mening att förstå, två slumpade spel (gåta, bygg en mening, sant eller falskt, udda ordet, rim, saknad bokstav, motsatser, ord som fattas i en mening eller en kort berättelse), en rörelsepaus och en rituppgift. Hon kan trycka på ett enskilt ord för att höra det, men hela meningar läses inte upp, så hon får läsa själv. Fel svar ger en ny chans och en ledtråd, aldrig minuspoäng. Ord, frågor och rituppdrag väljs så att hon inte får samma igen förrän allt i listan är använt, och ritidéerna byggs ihop slumpvis så att det finns hundratals. Efter uppdraget öppnar hon ett paket med en squishy. Det finns 104 att samla, och de legendariska är ovanligare. I december finns en julkalender med 24 julsquishies. Varje lucka går bara att öppna från sin dag, enligt telefonens datum.</p>
     <p class="note">Allt sparas bara i den här webbläsaren på den här enheten.</p>
   </div>
   <div class="card">
@@ -509,6 +542,56 @@ const RHYMES=[
  {w:"hatt",a:"natt",d:["mössa","sol"]},{w:"boll",a:"troll",d:["lek","fot"]},
  {w:"snö",a:"sjö",d:["is","kall"]},{w:"lus",a:"brus",d:["hår","kam"]}
 ];
+const OPPS=[
+ {w:"stor",a:"liten",d:["glad","röd"]},{w:"varm",a:"kall",d:["mjuk","snabb"]},{w:"glad",a:"ledsen",d:["stor","grön"]},
+ {w:"snabb",a:"långsam",d:["hög","söt"]},{w:"hög",a:"låg",d:["kall","rund"]},{w:"ljus",a:"mörk",d:["blöt","lång"]},
+ {w:"full",a:"tom",d:["hård","ny"]},{w:"ny",a:"gammal",d:["tung","glad"]},{w:"tung",a:"lätt",d:["mörk","varm"]},
+ {w:"lång",a:"kort",d:["mjuk","söt"]},{w:"mjuk",a:"hård",d:["liten","kall"]},{w:"blöt",a:"torr",d:["glad","ny"]},
+ {w:"öppen",a:"stängd",d:["stor","tyst"]},{w:"dag",a:"natt",d:["sol","vecka"]},{w:"först",a:"sist",d:["mitt","snabb"]},
+ {w:"inne",a:"ute",d:["hemma","uppe"]},{w:"ren",a:"smutsig",d:["blöt","varm"]},{w:"börja",a:"sluta",d:["springa","äta"]},
+ {w:"skratta",a:"gråta",d:["prata","hoppa"]},{w:"vinna",a:"förlora",d:["spela","springa"]},{w:"upp",a:"ner",d:["fram","in"]},
+ {w:"många",a:"få",d:["stora","alla"]},{w:"tjock",a:"smal",d:["lång","rund"]},{w:"sommar",a:"vinter",d:["höst","sol"]}
+];
+const CLOZES=[
+ {t:"{cat} ___ i korgen hela dagen.",a:"sover",d:["simmar","kör"]},
+ {t:"Igår ___ {name} en stor glass.",a:"åt",d:["äter","äta"]},
+ {t:"I morgon ska vi ___ till badhuset.",a:"åka",d:["åkte","åker"]},
+ {t:"Fåglarna ___ högt upp i luften.",a:"flyger",d:["simmar","gräver"]},
+ {t:"Det sitter tre ___ i trädet.",a:"fåglar",d:["fågel","fågeln"]},
+ {t:"{name} har två röda ___.",a:"vantar",d:["vante","vanten"]},
+ {t:"Igår ___ det hela natten.",a:"snöade",d:["snöar","snöa"]},
+ {t:"{cat} är ___ än en liten kattunge.",a:"större",d:["stor","störst"]},
+ {t:"Elefanten är det ___ djuret i hela zoo.",a:"största",d:["stor","större"]},
+ {t:"Hunden ___ på katten.",a:"skäller",d:["jamar","kvackar"]},
+ {t:"Vi ___ tänderna varje kväll.",a:"borstar",d:["klipper","målar"]},
+ {t:"{name} ___ en fin teckning igår.",a:"ritade",d:["ritar","rita"]},
+ {t:"Igår ___ han fort till bussen.",a:"sprang",d:["springer","springa"]},
+ {t:"Det är kallt, så ta på dig ___.",a:"jackan",d:["glassen","sanden"]},
+ {t:"{cat} dricker ___ ur en skål.",a:"vatten",d:["stolar","skor"]},
+ {t:"Mina ___ är blöta efter regnet.",a:"skor",d:["sko","skon"]},
+ {t:"Solen ___ på himlen.",a:"lyser",d:["regnar","sover"]},
+ {t:"{name} och hennes kompis vill ___ med squishies.",a:"leka",d:["leker","lekte"]},
+ {t:"På vintern ligger det ___ på marken.",a:"snö",d:["sol","sommar"]},
+ {t:"Jag har ___ squishies än du.",a:"fler",d:["flest","många"]},
+ {t:"Katten ___ upp i trädet förra veckan.",a:"klättrade",d:["klättrar","klättra"]},
+ {t:"Det var en gång en prinsessa som ___ i ett slott.",a:"bodde",d:["bor","bo"]}
+];
+const STORIES=[
+ {t:"{cat} vaknade tidigt. Han var hungrig och gick till köket. Där stod en skål med fisk.",q:"Vad stod i skålen?",a:"fisk",d:["mjölk","glass"]},
+ {t:"{name} gick till parken med pappa. De gungade och åt glass. Sedan började det regna.",q:"Vad hände sist?",a:"Det började regna.",d:["De åt glass.","De gungade."]},
+ {t:"Pingvinen Pingo ville flyga. Han hoppade och flaxade, men kom inte upp. Då hoppade han i vattnet och simmade fortast av alla.",q:"Vad var Pingo bra på?",a:"att simma",d:["att flyga","att springa"]},
+ {t:"Kaninen hade tappat sin morot. Den letade under en sten och bakom ett träd. Till slut hittade den moroten i gräset.",q:"Var hittade kaninen moroten?",a:"i gräset",d:["under en sten","bakom ett träd"]},
+ {t:"Det var lördag. {name} och mamma bakade bullar. Då hoppade {cat} upp på bänken och försökte sno en bulle!",q:"Vem försökte sno en bulle?",a:"{cat}",d:["mamma","{name}"]},
+ {t:"Nallen var ledsen för att det regnade. Då kom hans kompis med ett paraply. Nu kunde de gå ut och hoppa i vattenpölar.",q:"Varför blev nallen glad?",a:"Kompisen kom med ett paraply.",d:["Solen kom fram.","Han fick en glass."]},
+ {t:"Ugglan sover hela dagen. När det blir mörkt vaknar hon. Då flyger hon ut och letar mat.",q:"När vaknar ugglan?",a:"när det blir mörkt",d:["på morgonen","när solen lyser"]},
+ {t:"{name} hade tre squishies. Hon fick en till av mormor. Sedan gav hon en till sin kompis.",q:"Hur många squishies har {name} nu?",a:"tre",d:["fyra","två"]},
+ {t:"Grodan satt på ett blad i dammen. En fluga surrade förbi. Grodan sträckte ut tungan och slurp!",q:"Vad ville grodan fånga?",a:"en fluga",d:["en fisk","ett blad"]},
+ {t:"Det var kallt ute. {name} tog på sig mössa, vantar och halsduk. Men hon glömde stövlarna!",q:"Vad glömde {name}?",a:"stövlarna",d:["mössan","vantarna"]},
+ {t:"Fjärilen var först en liten larv. Larven åt och åt blad. Sedan sov den länge och vaknade som en fjäril.",q:"Vad var fjärilen först?",a:"en larv",d:["en fågel","ett blad"]},
+ {t:"{cat} ville upp på bokhyllan. Han hoppade på stolen, sedan på bordet och sist upp på hyllan.",q:"Var hoppade {cat} först?",a:"på stolen",d:["på bordet","på hyllan"]},
+ {t:"Lilla björnen var trött. Mamma björn bäddade en säng av mossa i grottan. Där sov björnen hela vintern.",q:"Var sov björnen?",a:"i grottan",d:["i ett träd","i sjön"]},
+ {t:"{name} skulle åka på kalas. Hon slog in en present och tog på sig sin finaste klänning. Men först måste hon hitta skorna!",q:"Vad måste {name} göra först?",a:"hitta skorna",d:["äta tårta","slå in presenten"]}
+];
 const DOS=[
  {t:"Sträck på dig som en katt som precis har vaknat.",e:"🐈"},
  {t:"Hoppa tre gånger som en glad kattunge.",e:"🐾"},
@@ -591,6 +674,88 @@ const SQ=[
  {id:43,n:"Knådboll Persika",c:"#FFAA7A",c2:"#FFE6D6",s:"doh"},
  {id:44,n:"Sockerbiten Regnbåge",c:"#FF8FC0",s:"cube",p:"rainbow",r:3}
 ];
+/* 60 nya: fjärilar, kaniner och nallar */
+const mkSet=(shape,id0,rows)=>rows.map((r,i)=>{const [n,c,c2,p,acc,face]=r;const x={id:id0+i,n,c,c2,s:shape};
+  if(p)x.p=p;if(acc)x.acc=acc;if(face)x.face=face;x.r=(p==="rainbow"||p==="galax"||n.startsWith("Guld"))?3:(p||acc==="crown"||acc==="heart")?2:1;return x});
+SQ.push(...mkSet("butterfly",45,[
+ ["Rosa Fjärilen","#FF8FC0","#FFC7E0"],["Himmelsfjärilen","#7FB2FF","#C4DCFF"],["Citronfjärilen","#FFD84A","#FFF0A8"],
+ ["Mintfjärilen","#5FD6B2","#BFF2E2"],["Persikofjärilen","#FFAA7A","#FFD9C2"],["Lavendelfjärilen","#B79CFF","#E1D6FF"],
+ ["Körsbärsfjärilen","#E8505B","#FF9FA6"],["Blåbärsfjärilen","#4C6FE8","#9FB4FF"],["Bubbelgumsfjärilen","#FF7AD9","#FFC2EE"],
+ ["Molnfjärilen","#E6ECF8","#FFFFFF"],["Solfjärilen","#FF9F43","#FFD24A"],["Prickfjärilen","#9B5DE5","#D9C4FF","dots"],
+ ["Glitterfjärilen","#FF8FC0","#FFE3F0","glitter"],["Kungsfjärilen","#7FB2FF","#FFD84A","","crown"],["Blomfjärilen","#8EE6A8","#FFC2DD","","flower"],
+ ["Hjärtfjärilen","#FF5A8A","#FFC2D4","","heart"],["Isfjärilen","#9FE3FF","#FFFFFF","glitter"],["Regnbågsfjärilen","#FF8FC0","#C79BFF","rainbow"],
+ ["Nattfjärilen","#2E2370","#8A5CF0","galax"],["Guldfjärilen","#FFC93C","#FFE7A3","glitter","crown"]]));
+SQ.push(...mkSet("bunny",65,[
+ ["Rosettkaninen","#FFFFFF","#FFB8CF","","bow"],["Blomkaninen","#FFE6EF","#FFB8CF","","flower"],["Prinsesskaninen","#FFD6E8","#FF8FC0","","crown"],
+ ["Chokladkaninen","#A0714F","#E6B89C"],["Mintkaninen","#BFF2E2","#FFB8CF"],["Molnkaninen","#F2F4FA","#DCD4F2"],
+ ["Persikakaninen","#FFD2B8","#FF9FA6"],["Glitterkaninen","#E3D4FF","#FFB8CF","glitter"],["Citronkaninen","#FFF0A8","#FFB86B"],
+ ["Himmelskaninen","#C4DCFF","#FFB8CF"],["Jordgubbskaninen","#FF9FB8","#FFE0EA","","bow"],["Lavendelkaninen","#D9C4FF","#FFC2EE","","flower"],
+ ["Kolakaninen","#D9A066","#FFE0C2"],["Snökaninen","#FFFFFF","#CFE6FF","glitter"],["Prickkaninen","#FFC2DD","#FF7AB0","dots"],
+ ["Sovkaninen","#F7F1FA","#FFB8CF","","","sleep"],["Bubbelgumskaninen","#FF9EE0","#FFE0F5"],["Regnbågskaninen","#FF8FC0","#FFFFFF","rainbow"],
+ ["Galaxkaninen","#2E2370","#8A5CF0","galax"],["Guldkaninen","#FFC93C","#FFF0A8","glitter","crown"]]));
+SQ.push(...mkSet("bear",85,[
+ ["Honungsnallen","#E0A050","#FFE0A8"],["Rosettnallen","#FFB8D2","#FFE6EF","","bow"],["Blomnallen","#C99A73","#F1DCC0","","flower"],
+ ["Kungsnallen","#A0714F","#E6C8A8","","crown"],["Blåbärsnallen","#8FA8FF","#DDE5FF"],["Mintnallen","#8EE0C4","#E0FFF5"],
+ ["Lavendelnallen","#C4AEFF","#EEE6FF"],["Citronnallen","#FFE48A","#FFF8D6"],["Persikanallen","#FFC2A0","#FFE8DA"],
+ ["Molnnallen","#EEF1F8","#FFFFFF"],["Chokladnallen","#7A4A2E","#C9A07E"],["Glitternallen","#FF9EC4","#FFE3F0","glitter"],
+ ["Hjärtnallen","#F0A8C0","#FFE6EF","","heart"],["Sovnallen","#B9A4D9","#EDE6F5","","","sleep"],["Prickiga Nallen","#FFD84A","#FFF4C2","dots"],
+ ["Kolanallen","#D9A066","#F8DCC0"],["Bubbelgumsnallen","#FF7AD9","#FFD6F5"],["Regnbågsnallen","#FF8FC0","#FFFFFF","rainbow"],
+ ["Galaxnallen","#2E2370","#8A5CF0","galax"],["Guldnallen","#FFC93C","#FFF0A8","glitter","crown"]]));
+
+/* Julkalenderns 24 squishies, en per lucka */
+const XMAS=[
+ {d:1,n:"Tomtekatten",s:"cat",c:"#FFB3CC",acc:"santa"},
+ {d:2,n:"Pepparkaksgubben",s:"ginger",c:"#C67B3C"},
+ {d:3,n:"Julgranen",s:"tree",c:"#3FAF6A"},
+ {d:4,n:"Snögubben",s:"snowman",c:"#FFFFFF"},
+ {d:5,n:"Röda julkulan",s:"ornament",c:"#E8505B",c2:"#FF9FA6"},
+ {d:6,n:"Renen",s:"bear",c:"#A0714F",c2:"#E6C8A8",acc:"antlers"},
+ {d:7,n:"Lussekatten",s:"doh",c:"#FFB52E",c2:"#FFE7A3"},
+ {d:8,n:"Tomtenallen",s:"bear",c:"#C99A73",c2:"#F1DCC0",acc:"santa"},
+ {d:9,n:"Knådboll Snöflinga",s:"doh",c:"#9ED6FF",c2:"#FFFFFF",p:"glitter",r:2},
+ {d:10,n:"Pepparkakshjärtat",s:"heart",c:"#C67B3C",acc:"icing"},
+ {d:11,n:"Gröna julkulan",s:"ornament",c:"#2E9B5A",c2:"#A8E8C0"},
+ {d:12,n:"Knådboll Polkagris",s:"doh",c:"#FFFFFF",c2:"#FFFFFF",p:"stripes",r:2},
+ {d:13,n:"Luciakaninen",s:"bunny",c:"#FFFFFF",c2:"#FFB8CF",acc:"candles",r:2},
+ {d:14,n:"Isbjörn med halsduk",s:"bear",c:"#FFFFFF",c2:"#E9E2F3",acc:"scarf"},
+ {d:15,n:"Glittergranen",s:"tree",c:"#2E9B5A",p:"glitter",r:2},
+ {d:16,n:"Rudolf",s:"bear",c:"#A0714F",c2:"#E6C8A8",acc:["antlers","nose"],r:2},
+ {d:17,n:"Julstjärnan",s:"star",c:"#FFD84A",p:"glitter",r:2},
+ {d:18,n:"Snöprinsessan",s:"mochi",c:"#EEF6FF",p:"glitter",acc:"crown",r:2},
+ {d:19,n:"Tomtemunken",s:"donut",c:"#E8505B",acc:"santa"},
+ {d:20,n:"Knådboll Glögg",s:"doh",c:"#B0233A",c2:"#FF7A8A"},
+ {d:21,n:"Tomtekaninen",s:"bunny",c:"#F7F1FA",c2:"#FFB8CF",acc:"santa"},
+ {d:22,n:"Julfjärilen",s:"butterfly",c:"#E8505B",c2:"#3FAF6A"},
+ {d:23,n:"Guldkulan",s:"ornament",c:"#FFC93C",c2:"#FFF0A8",p:"glitter",r:3},
+ {d:24,n:"Blixten-tomten",s:"cat",c:"#F0CBA0",tufts:1,acc:"santa",r:3}
+].map(x=>({...x,id:200+x.d}));
+const XQ={
+ 1:{t:"Tomten har ett långt vitt skägg.",a:"🎅",d:["🐸","🚀"]},
+ 2:{t:"Vi bakar pepparkakor i köket.",a:"🍪",d:["⛄","🎸"]},
+ 3:{t:"Vi pyntar granen med glittriga kulor.",a:"🎄",d:["🌵","🍄"]},
+ 4:{t:"Snögubben har en morot som näsa.",a:"⛄",d:["🦒","🚂"]},
+ 5:{t:"Det är mörkt ute, så vi tänder ett ljus.",a:"🕯️",d:["🧲","🥕"]},
+ 6:{t:"Renen drar tomtens släde genom snön.",a:"🦌",d:["🐢","🐙"]},
+ 7:{t:"{name} skriver ett brev till tomten.",a:"✉️",d:["🔨","🧀"]},
+ 8:{t:"Det snöar och {cat} tittar ut genom fönstret.",a:"❄️",d:["☀️","🌋"]},
+ 9:{t:"Vi åker pulka nerför den stora backen.",a:"🛷",d:["🚁","⛵"]},
+ 10:{t:"{name} dricker varm choklad med grädde.",a:"☕",d:["🍦","🥕"]},
+ 11:{t:"Pingvinen åker skridskor på isen.",a:"🐧",d:["🦁","🐫"]},
+ 12:{t:"Tomtens hus ligger långt upp i norr där det är kallt.",a:"🏔️",d:["🏝️","🌵"]},
+ 13:{t:"I dag är det lucia. Vi sjunger och har ljus i håret.",a:"🕯️",d:["🦈","🎸"]},
+ 14:{t:"Det är så kallt att {name} har vantar på händerna.",a:"🧤",d:["🩳","🕶️"]},
+ 15:{t:"{cat} leker med en blank röd julkula.",a:"🔴",d:["🔑","🥞"]},
+ 16:{t:"Vi bygger ett hus av pepparkakor.",a:"🏠",d:["🚀","🐌"]},
+ 17:{t:"Stjärnan sitter högst upp i granen.",a:"⭐",d:["🍄","🐟"]},
+ 18:{t:"{name} ligger i snön och gör en snöängel.",a:"👼",d:["🦖","🚕"]},
+ 19:{t:"{name} knyter en fin rosett på paketet.",a:"🎀",d:["🔨","🥾"]},
+ 20:{t:"Tomten klättrar ner genom skorstenen.",a:"🎅",d:["🐬","🌻"]},
+ 21:{t:"Vi hänger upp en stor strumpa vid brasan.",a:"🧦",d:["🧢","⚽"]},
+ 22:{t:"Det har snöat hela natten och allt är vitt.",a:"🌨️",d:["🌈","🔥"]},
+ 23:{t:"I morgon är det julafton. {name} kan inte sova!",a:"😴",d:["🏖️","🎃"]},
+ 24:{t:"God jul, {name}! I dag kommer tomten med paket.",a:"🎁",d:["🎃","🐣"]}
+};
+const ALL=()=>[...SQ,...XMAS];
 const RAR=["","Vanlig","Sällsynt ✨","Legendarisk 🌟"];
 const rar=q=>q.r||1;
 const isDoh=q=>q.s==="doh"||q.s==="cube";
@@ -618,15 +783,35 @@ function catSVG(id="catSvg",cls="cat"){return `<svg class="${cls}" id="${id}" vi
 </svg>`}
 
 function seeded(n){let x=n*7919%233280;return()=>{x=(x*9301+49297)%233280;return x/233280}}
-function sqFace(fy=0,eye="#2A2340",hi="#fff"){return `<g transform="translate(0 ${fy})">
-  <circle cx="46" cy="66" r="5" fill="${eye}"/><circle cx="74" cy="66" r="5" fill="${eye}"/>
-  <circle cx="47.5" cy="64.5" r="1.6" fill="${hi}"/><circle cx="75.5" cy="64.5" r="1.6" fill="${hi}"/>
+function sqFace(fy=0,eye="#2A2340",hi="#fff",sleep=false,mouth="#2A2340"){return `<g transform="translate(0 ${fy})">
+  ${sleep?`<path d="M40 66 q6 5 12 0 M68 66 q6 5 12 0" stroke="${eye}" stroke-width="2.6" fill="none" stroke-linecap="round"/><text x="92" y="44" font-size="14" font-weight="800" fill="${eye}" font-family="sans-serif">z</text><text x="100" y="34" font-size="10" font-weight="800" fill="${eye}" font-family="sans-serif">z</text>`:
+  `<circle cx="46" cy="66" r="5" fill="${eye}"/><circle cx="74" cy="66" r="5" fill="${eye}"/>
+  <circle cx="47.5" cy="64.5" r="1.6" fill="${hi}"/><circle cx="75.5" cy="64.5" r="1.6" fill="${hi}"/>`}
   <ellipse cx="36" cy="78" rx="7" ry="4" fill="#FF7FA3" opacity=".55"/><ellipse cx="84" cy="78" rx="7" ry="4" fill="#FF7FA3" opacity=".55"/>
-  <path d="M54 76 q3 4 6 0 q3 4 6 0" stroke="#2A2340" stroke-width="2.4" fill="none" stroke-linecap="round"/></g>`}
+  <path d="M54 76 q3 4 6 0 q3 4 6 0" stroke="${mouth}" stroke-width="2.4" fill="none" stroke-linecap="round"/></g>`}
+const TOP={cat:28,heart:30,doh:16,cube:18,donut:16,toast:14,icecream:16,bear:26,bunny:36,frog:28,panda:26,star:12,unicorn:32,butterfly:36,tree:8,ginger:12,snowman:18,ornament:28,mochi:32};
+function accSVG(a,T,L){
+  if(L)return"";
+  switch(a){
+    case "santa":return `<path d="M34 ${T+4} C40 ${T-22} 76 ${T-30} 96 ${T-12} C90 ${T-14} 84 ${T-8} 86 ${T+4}Z" fill="#E8505B"/><rect x="30" y="${T}" width="60" height="11" rx="5.5" fill="#fff"/><circle cx="96" cy="${T-12}" r="7" fill="#fff"/>`;
+    case "crown":return `<path d="M42 ${T+4} L40 ${T-14} L50 ${T-5} L60 ${T-18} L70 ${T-5} L80 ${T-14} L78 ${T+4}Z" fill="#FFD84A" stroke="#E0A800" stroke-width="1.5" stroke-linejoin="round"/><circle cx="60" cy="${T-4}" r="2.6" fill="#FF5A8A"/>`;
+    case "bow":return `<g transform="translate(82 ${T+6})"><path d="M0 0 L-14 -9 L-14 9Z M0 0 L14 -9 L14 9Z" fill="#FF5A8A" stroke="#E0306A" stroke-width="1.5" stroke-linejoin="round"/><circle r="4" fill="#E0306A"/></g>`;
+    case "flower":return `<g transform="translate(36 ${T+8})">${[0,72,144,216,288].map(g=>`<circle cx="${(Math.cos(g*Math.PI/180)*6).toFixed(1)}" cy="${(Math.sin(g*Math.PI/180)*6).toFixed(1)}" r="5" fill="#fff"/>`).join("")}<circle r="4" fill="#FFD84A"/></g>`;
+    case "heart":return `<path d="M60 112 C46 102 46 92 54 92 C57 92 59 94 60 96 C61 94 63 92 66 92 C74 92 74 102 60 112Z" fill="#FF5A8A"/>`;
+    case "antlers":return `<path d="M40 ${T} L32 ${T-20} M34 ${T-14} L24 ${T-18} M33 ${T-18} L36 ${T-28} M80 ${T} L88 ${T-20} M86 ${T-14} L96 ${T-18} M87 ${T-18} L84 ${T-28}" stroke="#8B5A2B" stroke-width="5" stroke-linecap="round" fill="none"/>`;
+    case "nose":return `<circle cx="60" cy="73" r="6" fill="#E8203A"/><circle cx="58" cy="71" r="2" fill="#fff" opacity=".7"/>`;
+    case "scarf":return `<path d="M22 92 Q60 108 98 92 L98 102 Q60 118 22 102Z" fill="#E8505B"/><rect x="72" y="100" width="11" height="18" rx="3" fill="#E8505B"/><path d="M30 96 v8 M44 100 v8 M58 102 v8 M72 101 v8 M86 98 v8" stroke="#fff" stroke-width="2"/>`;
+    case "icing":return `<path d="M30 46 q8 -8 16 0 q8 8 16 0 q8 -8 16 0 q8 8 14 0" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+    case "candles":return `<path d="M34 ${T+2} Q60 ${T-8} 86 ${T+2}" stroke="#4CB944" stroke-width="5" fill="none"/>${[38,52,68,82].map(x=>`<rect x="${x-2.5}" y="${T-16}" width="5" height="13" rx="1.5" fill="#fff"/><path d="M${x} ${T-25} q4 5 0 8 q-4 -3 0 -8z" fill="#FFB52E"/>`).join("")}`;
+  }
+  return "";
+}
 function sqSVG(q,locked,cls=""){
   const L=locked, c=L?"#BDB6CF":q.c, c2=L?"#CFC9DD":(q.c2||q.c), gid="g"+q.id+cls.replace(/\W/g,"");
   let defs="",body="",over="",face=sqFace(),shine=`<ellipse cx="42" cy="48" rx="10" ry="6" fill="#fff" opacity=".45"/>`;
   const fillG=(q.p==="rainbow"&&!L)?`url(#${gid}r)`:`url(#${gid})`;
+  const bodyFill=L?c:(q.p==="rainbow"?`url(#${gid}r)`:q.p==="galax"?`url(#${gid})`:c);
+  const darkFace=q.p==="galax"&&!L;
   defs=`<radialGradient id="${gid}" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="${c2}"/><stop offset="1" stop-color="${c}"/></radialGradient>
    <linearGradient id="${gid}r" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF8FB8"/><stop offset=".25" stop-color="#FFD86B"/><stop offset=".5" stop-color="#8EE6A8"/><stop offset=".75" stop-color="#7FB2FF"/><stop offset="1" stop-color="#C79BFF"/></linearGradient>`;
   switch(q.s){
@@ -644,8 +829,26 @@ function sqSVG(q,locked,cls=""){
     case "toast":body=`<path d="M18 110 V54 C2 50 4 14 34 14 H86 C116 14 118 50 102 54 V110 Z" fill="${L?c:"#D9A15B"}"/><path d="M27 103 V50 C14 46 16 23 36 23 H84 C104 23 106 46 93 50 V103Z" fill="${c}"/>`;face=sqFace(4);break;
     case "icecream":body=`<path d="M36 70 L60 118 L84 70Z" fill="${L?c2:"#E0A45E"}"/><path d="M42 80 h36 M48 92 h24" stroke="${L?c:"#C4843E"}" stroke-width="2.5"/><circle cx="60" cy="50" r="34" fill="${c}"/><path d="M26 56 q8 16 17 4 q9 14 17 2 q8 14 17 2 q8 12 17 -8" fill="${c}"/>`;
       over=L?"":`<circle cx="60" cy="14" r="6" fill="#E8505B"/><path d="M60 9 q4 -8 10 -6" stroke="#4CB944" stroke-width="2" fill="none"/>`;face=sqFace(-14);shine=`<ellipse cx="44" cy="30" rx="9" ry="5" fill="#fff" opacity=".5"/>`;break;
-    case "bear":body=`<circle cx="24" cy="32" r="16" fill="${c}"/><circle cx="96" cy="32" r="16" fill="${c}"/><circle cx="24" cy="32" r="8" fill="${c2}"/><circle cx="96" cy="32" r="8" fill="${c2}"/><ellipse cx="60" cy="68" rx="48" ry="42" fill="${c}"/><ellipse cx="60" cy="80" rx="15" ry="10" fill="${c2}"/>`;break;
-    case "bunny":body=`<ellipse cx="40" cy="26" rx="11" ry="26" fill="${c}"/><ellipse cx="80" cy="26" rx="11" ry="26" fill="${c}"/><ellipse cx="40" cy="28" rx="5" ry="17" fill="${L?c2:"#FFB8CF"}"/><ellipse cx="80" cy="28" rx="5" ry="17" fill="${L?c2:"#FFB8CF"}"/><ellipse cx="60" cy="74" rx="46" ry="38" fill="${c}"/>`;face=sqFace(6);break;
+    case "bear":body=`<circle cx="24" cy="32" r="16" fill="${bodyFill}"/><circle cx="96" cy="32" r="16" fill="${bodyFill}"/><circle cx="24" cy="32" r="8" fill="${c2}"/><circle cx="96" cy="32" r="8" fill="${c2}"/><ellipse cx="60" cy="68" rx="48" ry="42" fill="${bodyFill}"/><ellipse cx="60" cy="80" rx="15" ry="10" fill="${c2}"/>`;break;
+    case "bunny":body=`<ellipse cx="40" cy="26" rx="11" ry="26" fill="${bodyFill}"/><ellipse cx="80" cy="26" rx="11" ry="26" fill="${bodyFill}"/><ellipse cx="40" cy="28" rx="5" ry="17" fill="${L?c2:(q.id>=65?c2:"#FFB8CF")}"/><ellipse cx="80" cy="28" rx="5" ry="17" fill="${L?c2:(q.id>=65?c2:"#FFB8CF")}"/><ellipse cx="60" cy="74" rx="46" ry="38" fill="${bodyFill}"/>`;face=sqFace(6);break;
+    case "butterfly":{const wing=L?c:(q.p==="rainbow"?`url(#${gid}r)`:`url(#${gid})`);
+      body=`<path d="M54 40 q-10 -20 -18 -26 M66 40 q10 -20 18 -26" stroke="${L?c:"#5B4A8A"}" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="36" cy="14" r="4" fill="${L?c:"#5B4A8A"}"/><circle cx="84" cy="14" r="4" fill="${L?c:"#5B4A8A"}"/>
+        <ellipse cx="32" cy="50" rx="28" ry="24" fill="${wing}" transform="rotate(-20 32 50)"/><ellipse cx="88" cy="50" rx="28" ry="24" fill="${wing}" transform="rotate(20 88 50)"/>
+        <ellipse cx="36" cy="90" rx="20" ry="18" fill="${c2}"/><ellipse cx="84" cy="90" rx="20" ry="18" fill="${c2}"/>
+        ${L?"":`<circle cx="24" cy="46" r="6" fill="#fff" opacity=".6"/><circle cx="96" cy="46" r="6" fill="#fff" opacity=".6"/><circle cx="32" cy="92" r="4" fill="#fff" opacity=".6"/><circle cx="88" cy="92" r="4" fill="#fff" opacity=".6"/>`}
+        <ellipse cx="60" cy="70" rx="24" ry="34" fill="${L?c2:"#FFF4F8"}"/>`;
+      shine=`<ellipse cx="52" cy="50" rx="6" ry="4" fill="#fff" opacity=".6"/>`;break}
+    case "tree":body=`<rect x="52" y="98" width="16" height="18" rx="3" fill="${L?c2:"#8B5A2B"}"/><path d="M60 10 L24 60 L96 60Z" fill="${c}" stroke="${c}" stroke-width="8" stroke-linejoin="round"/><path d="M60 32 L16 98 L104 98Z" fill="${c}" stroke="${c}" stroke-width="8" stroke-linejoin="round"/>`;
+      if(!L)over+=`<circle cx="42" cy="52" r="5" fill="#E8505B"/><circle cx="80" cy="50" r="5" fill="#FFD84A"/><circle cx="28" cy="92" r="5" fill="#7FB2FF"/><circle cx="92" cy="92" r="5" fill="#E8505B"/><polygon points="60,0 63,8 72,8 65,13 68,21 60,16 52,21 55,13 48,8 57,8" fill="#FFD84A"/>`;
+      face=sqFace(10);shine="";break;
+    case "ginger":body=`<ellipse cx="30" cy="74" rx="17" ry="9" fill="${c}" transform="rotate(-20 30 74)"/><ellipse cx="90" cy="74" rx="17" ry="9" fill="${c}" transform="rotate(20 90 74)"/><ellipse cx="46" cy="106" rx="11" ry="12" fill="${c}"/><ellipse cx="74" cy="106" rx="11" ry="12" fill="${c}"/><ellipse cx="60" cy="84" rx="24" ry="24" fill="${c}"/><circle cx="60" cy="40" r="28" fill="${c}"/>`;
+      if(!L)over+=`<path d="M18 70 q4 4 8 0 M94 70 q4 4 8 0" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="60" cy="80" r="3.5" fill="#fff"/><circle cx="60" cy="92" r="3.5" fill="#E8505B"/>`;
+      face=sqFace(-26);shine=`<ellipse cx="46" cy="24" rx="8" ry="5" fill="#fff" opacity=".35"/>`;break;
+    case "snowman":body=`<circle cx="60" cy="88" r="30" fill="${L?c:"#FFFFFF"}" stroke="${L?c:"#DCE6F5"}" stroke-width="2"/><circle cx="60" cy="44" r="27" fill="${L?c:"#FFFFFF"}" stroke="${L?c:"#DCE6F5"}" stroke-width="2"/>`;
+      if(!L)over+=`<path d="M60 49 l14 3 l-14 3z" fill="#FF9F43"/><circle cx="60" cy="82" r="3.5" fill="#2A2340"/><circle cx="60" cy="96" r="3.5" fill="#2A2340"/><path d="M30 66 Q60 80 90 66 L90 74 Q60 88 30 74Z" fill="#E8505B"/><rect x="70" y="72" width="10" height="16" rx="3" fill="#E8505B"/>`;
+      face=sqFace(-24);shine="";break;
+    case "ornament":body=`<rect x="50" y="20" width="20" height="12" rx="3" fill="${L?c2:"#E0A800"}"/><circle cx="60" cy="15" r="6" fill="none" stroke="${L?c2:"#E0A800"}" stroke-width="3"/><circle cx="60" cy="72" r="42" fill="${L?c:`url(#${gid})`}"/>`;
+      if(!L)over+=`<path d="M22 64 q38 14 76 0" stroke="#fff" stroke-width="3" fill="none" opacity=".6"/>`;face=sqFace(6);break;
     case "frog":body=`<circle cx="36" cy="38" r="17" fill="${c}"/><circle cx="84" cy="38" r="17" fill="${c}"/><ellipse cx="60" cy="74" rx="50" ry="38" fill="${c}"/>`;
       face=`<circle cx="36" cy="36" r="10" fill="#fff"/><circle cx="84" cy="36" r="10" fill="#fff"/><circle cx="37" cy="37" r="5" fill="#2A2340"/><circle cx="83" cy="37" r="5" fill="#2A2340"/>
         <ellipse cx="32" cy="80" rx="7" ry="4" fill="#FF7FA3" opacity=".55"/><ellipse cx="88" cy="80" rx="7" ry="4" fill="#FF7FA3" opacity=".55"/><path d="M40 78 q20 16 40 0" stroke="#2A2340" stroke-width="2.6" fill="none" stroke-linecap="round"/>`;
@@ -658,6 +861,13 @@ function sqSVG(q,locked,cls=""){
     default:body=`<ellipse cx="60" cy="70" rx="48" ry="38" fill="${c}"/>`;
   }
   if(q.leaf)over+=`<path d="M60 30 c-4 -10 4 -18 14 -16 c-2 10 -8 16 -14 16z" fill="${L?c2:"#4CB944"}"/>`;
+  if(!L&&q.p==="dots"){const r=seeded(q.id+7);const cx=60,cy=q.s==="butterfly"?50:70;for(let i=0;i<10;i++){const a=r()*6.28,d=14+r()*28,x=cx+Math.cos(a)*d*(q.s==="butterfly"?1.4:1),y=cy+Math.sin(a)*d*.8;
+    if(Math.abs(x-60)<20&&Math.abs(y-70)<14)continue;over+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(3+r()*2).toFixed(1)}" fill="#fff" opacity=".8"/>`}}
+  if(!L&&q.p==="stripes"){defs+=`<clipPath id="${gid}c"><circle cx="60" cy="64" r="48"/></clipPath>`;
+    over+=`<g clip-path="url(#${gid}c)">${[-40,-10,20,50,80,110].map(x=>`<path d="M${x} 130 L${x+60} -10" stroke="#E8203A" stroke-width="10"/>`).join("")}</g>`}
+  [q.acc].flat().filter(Boolean).forEach(a=>over+=accSVG(a,TOP[q.s]??30,L));
+  if(q.face==="sleep"&&!L)face=sqFace(q.s==="bunny"?6:0,"#2A2340","#fff",true);
+  if(darkFace&&q.s!=="butterfly")face=face.replaceAll('fill="#2A2340"','fill="#FFFFFF"').replaceAll('stroke="#2A2340"','stroke="#FFFFFF"').replace(/<circle cx="(47\.5|75\.5)"[^>]*\/>/g,"");
   if(!L&&(q.p==="glitter"||q.p==="galax")){const r=seeded(q.id+3);for(let i=0;i<(q.p==="galax"?22:18);i++){const a=r()*6.28,d=Math.sqrt(r())*40;
     const x=60+Math.cos(a)*d,y=64+Math.sin(a)*d;over+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(r()*1.6+.8).toFixed(1)}" fill="${q.p==="galax"?"#fff":(i%3?"#fff":"#FFD84A")}" opacity=".85"/>`}}
   if(!L&&rar(q)===3)over+=`<path d="M104 10 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3z M14 92 l2 5 l5 2 l-5 2 l-2 5 l-2 -5 l-5 -2 l5 -2z" fill="#FFD84A"/>`;
@@ -667,14 +877,15 @@ function sqSVG(q,locked,cls=""){
 }
 
 /* ---------- navigation ---------- */
-const VIEWS=["home","mission","reward","collection","gallery","pin","grown"];
+const VIEWS=["home","mission","reward","collection","gallery","advent","pin","grown"];
 function show(id){VIEWS.forEach(v=>$("#"+v).hidden=v!==id);window.scrollTo(0,0);
-  if(id==="home")renderHome();if(id==="collection")renderColl();if(id==="gallery")renderGal();if(id==="grown")renderGrown();if(id==="pin")renderPin();}
+  if(id==="home")renderHome();if(id==="collection")renderColl();if(id==="gallery")renderGal();if(id==="grown")renderGrown();if(id==="pin")renderPin();if(id==="advent")renderAdvent();}
 document.querySelectorAll("[data-home]").forEach(b=>b.onclick=()=>show("home"));
 
 function renderHome(){
   $("#hello").textContent=`Hej ${S.name}!`;
-  $("#countChip").textContent=`${S.owned.length} av ${SQ.length} squishies`;
+  $("#countChip").textContent=`${S.owned.filter(i=>i<200).length} av ${SQ.length} squishies`;
+  const ready=advReady();$("#toAdvent").innerHTML="🎄 Julkalender"+(ready.length?`<span class="badge">Lucka ${ready[ready.length-1]} väntar!</span>`:"");
   $("#catHome").innerHTML=catSVG();
   const lines=S.missions===0?[`Mjau! Jag heter ${S.cat}. Ska vi göra ett uppdrag tillsammans?`]:
     [`Mjau! Ska vi göra dagens uppdrag, ${S.name}?`,`Jag har gömt en ny squishy. Vill du hitta den?`,`Du har klarat ${S.missions} uppdrag. Wow!`];
@@ -692,7 +903,7 @@ function fresh1(key,list,id=x=>typeof x==="string"?x:(x.w||x.t||x.q?.t||x.r?.t||
 function freshN(key,list,n){const out=[];for(let i=0;i<n;i++)out.push(fresh1(key,list));return out}
 
 /* Ritidéer byggs ihop av delar, så det blir hundratals olika */
-const DR_WHO=["en katt","{cat}","en panda","en enhörning","en groda","en pingvin","en kanin","en nalle","en räv","en uggla","en giraff","en drake","en hund","en bläckfisk","en squishy","en snögubbe","en robot","en häst","en igelkott","en sköldpadda"];
+const DR_WHO=["en fjäril","en katt","{cat}","en panda","en enhörning","en groda","en pingvin","en kanin","en nalle","en räv","en uggla","en giraff","en drake","en hund","en bläckfisk","en squishy","en snögubbe","en robot","en häst","en igelkott","en sköldpadda"];
 const DR_DO=["som åker skateboard","som äter glass","som dansar","som sover i en säng","som åker raket","som spelar gitarr","som bakar en tårta","som simmar","som klämmer på en knådboll","som har kalas","som läser en bok","som åker skidor","som flyger med ballonger","som målar en tavla","som hoppar studsmatta","som fiskar","som gör en moonwalk","som badar i ett badkar","som åker pulka","som grillar korv"];
 const DR_WHERE=["på månen","under vattnet","i snön","på stranden","i skogen","i ett slott","i regnet","i rymden","på en regnbåge","i djungeln","i en stor stad","på en båt","på toppen av ett berg","i ett godisland"];
 const DR_HAS=["med en röd hatt","med solglasögon","med en krona","med prickiga strumpor","med en lång halsduk","med vingar","med en ryggsäck","med en blomma i håret","med jättestora skor","med en superhjältemantel"];
@@ -706,10 +917,11 @@ function drawIdea(){
 
 /* ---------- mission ---------- */
 let M=null;
-const GAMES=["riddle","order","tf","odd","rhyme"];
+const GAMES=["riddle","order","tf","odd","rhyme","miss","opp","cloze","story"];
+const VOW="aeiouyåäö";
 function newMission(){
   const words=freshN("word",WORDS,2),g=shuffle(GAMES).slice(0,2);
-  const mk=t=>t==="riddle"?{type:t,r:fresh1("riddle",RIDDLES)}:t==="order"?{type:t,o:fresh1("order",ORDERS)}:t==="tf"?{type:t,q:fresh1("tf",TFS)}:t==="odd"?{type:t,q:fresh1("odd",ODDS,x=>x.a)}:{type:t,q:fresh1("rhyme",RHYMES)};
+  const mk=t=>t==="riddle"?{type:t,r:fresh1("riddle",RIDDLES)}:t==="order"?{type:t,o:fresh1("order",ORDERS)}:t==="tf"?{type:t,q:fresh1("tf",TFS)}:t==="odd"?{type:t,q:fresh1("odd",ODDS,x=>x.a)}:t==="miss"?{type:t,w:fresh1("miss",WORDS.filter(x=>!x.w.includes(" ")))}:t==="opp"?{type:t,q:fresh1("opp",OPPS)}:t==="cloze"?{type:t,q:fresh1("cloze",CLOZES)}:t==="story"?{type:t,q:fresh1("story",STORIES)}:{type:t,q:fresh1("rhyme",RHYMES)};
   M={i:0,streak:0,steps:[{type:"word",w:words[0]},mk(g[0]),{type:"sent",s:fresh1("sent",SENTS)},{type:"do",d:fresh1("do",DOS)},{type:"word",w:words[1]},mk(g[1]),{type:"draw",t:drawIdea()}]};
   save();
   show("mission");renderStep();
@@ -772,6 +984,39 @@ function renderStep(){
       <div class="read big">${tappable(st.q.w)}</div>
       ${optBtns(shuffle([st.q.a,...st.q.d]))}${tail}`;
     answer(st.q.a,goNext);
+  }
+  if(st.type==="miss"){
+    const w=st.w.w,idx=[...w].map((ch,i)=>VOW.includes(ch)?i:-1).filter(i=>i>=0),i=pick(idx),right=w[i];
+    const wrong=shuffle([...VOW].filter(v=>v!==right)).slice(0,2);
+    stage.innerHTML=`<div class="card">
+      <p class="ask">Vilken bokstav saknas?</p>
+      <div class="do-emoji" aria-hidden="true">${st.w.e}</div>
+      <div class="read big" id="missWord">${esc(w.slice(0,i))}<span class="blank">_</span>${esc(w.slice(i+1))}</div>
+      <div class="opts letters">${shuffle([right,...wrong]).map(o=>`<button class="pic opt" data-e="${o}">${o}</button>`).join("")}</div>${tail}`;
+    answer(right,()=>{$("#missWord").innerHTML=tappable(w);goNext()});
+  }
+  if(st.type==="opp"){
+    stage.innerHTML=`<div class="card">
+      <p class="ask">Vad är motsatsen till</p>
+      <div class="read big">${tappable(st.q.w)}</div>
+      ${optBtns(shuffle([st.q.a,...st.q.d]))}${tail}`;
+    answer(st.q.a,goNext);
+  }
+  if(st.type==="cloze"){
+    const t=fill(st.q.t),parts=t.split("___");
+    stage.innerHTML=`<div class="card">
+      <p class="ask">Vilket ord passar i meningen?</p>
+      <div class="read" id="clozeText">${tappable(parts[0].trim())} <span class="blank">______</span> ${tappable(parts[1].trim())}</div>
+      ${optBtns(shuffle([st.q.a,...st.q.d]))}${tail}`;
+    answer(st.q.a,()=>{$("#clozeText .blank").textContent=st.q.a;$("#clozeText .blank").classList.add("filled");goNext()});
+  }
+  if(st.type==="story"){
+    stage.innerHTML=`<div class="card">
+      <p class="ask">Läs berättelsen.</p>
+      <div class="read story">${tappable(fill(st.q.t))}</div>
+      <p class="ask question">${esc(fill(st.q.q))}</p>
+      ${optBtns(shuffle([st.q.a,...st.q.d]).map(fill))}${tail}`;
+    answer(fill(st.q.a),goNext);
   }
   if(st.type==="order"){
     const full=fill(st.o.t),target=full.replace(/[.!?]$/,"").split(" ");
@@ -861,7 +1106,7 @@ function saveDrawing(){
 
 /* ---------- reward: mystery gift ---------- */
 function drawSquishy(){
-  const left=SQ.filter(q=>!S.owned.includes(q.id));
+  const left=SQ.filter(q=>!S.owned.includes(q.id));/* bara vanliga squishies, julsakerna finns i kalendern */
   const pool=left.length?left:SQ, w={1:6,2:3,3:1};
   let t=pool.reduce((a,q)=>a+w[rar(q)],0)*Math.random();
   for(const q of pool){t-=w[rar(q)];if(t<=0)return{q,isNew:!!left.length}}
@@ -914,17 +1159,68 @@ function openPlay(q){
 $("#playClose").onclick=()=>$("#play").hidden=true;
 
 function renderColl(){
-  const n=S.owned.length;
+  const n=S.owned.filter(i=>i<200).length;
   $("#collNote").textContent=n===SQ.length?"Du har hittat alla! Fantastiskt.":`Du har hittat ${n} av ${SQ.length}. Tryck på en squishy för att klämma på den!`;
   $("#collGrid").innerHTML=SQ.map(q=>{const has=S.owned.includes(q.id);
     return has?`<button class="tile r${rar(q)}" data-id="${q.id}">${sqSVG(q,false)}<span class="nm">${esc(q.n)}</span></button>`:
       `<div class="tile locked">${sqSVG(q,true)}<span class="nm">Gömd</span></div>`}).join("");
-  document.querySelectorAll("#collGrid button.tile").forEach(b=>b.onclick=()=>openPlay(SQ.find(q=>q.id==b.dataset.id)));
+  const xn=XMAS.filter(q=>S.owned.includes(q.id)).length;$("#xNote").textContent=`${xn} av 24`;
+  $("#xGrid").innerHTML=XMAS.map(q=>{const has=S.owned.includes(q.id);
+    return has?`<button class="tile r${rar(q)}" data-id="${q.id}">${sqSVG(q,false)}<span class="nm">${esc(q.n)}</span></button>`:
+      `<div class="tile locked">${sqSVG(q,true)}<span class="nm">Lucka ${q.d}</span></div>`}).join("");
+  document.querySelectorAll("#collGrid button.tile,#xGrid button.tile").forEach(b=>b.onclick=()=>openPlay(ALL().find(q=>q.id==b.dataset.id)));
 }
 function renderGal(){
   $("#galGrid").innerHTML=S.drawings.length?[...S.drawings].reverse().map(d=>`<img src="${d}" alt="Teckning">`).join(""):
     `<p class="empty" style="grid-column:1/-1">Här hamnar dina teckningar när du har gjort ett uppdrag.</p>`;
 }
+
+/* ---------- julkalender ---------- */
+/* Luckan öppnas först på rätt dag i december (enligt telefonens datum). Missade luckor kan öppnas senare. */
+const DOOR_ORDER=[13,6,21,2,17,9,24,4,11,19,1,15,7,22,10,3,18,12,5,20,8,16,23,14];
+function advNow(){const n=new Date();return{y:n.getFullYear(),m:n.getMonth(),d:n.getDate()}}
+function advOpenDay(day){const t=advNow();return t.m===11?day<=t.d:t.m===0}
+function advReady(){return XMAS.filter(q=>advOpenDay(q.d)&&!S.owned.includes(q.id)).map(q=>q.d)}
+function daysUntil(day){const t=advNow(),yr=t.m===0?t.y-1:t.y,target=new Date(yr,11,day),now=new Date(t.y,t.m,t.d);return Math.round((target-now)/864e5)}
+function renderAdvent(){
+  $("#advStage").hidden=true;$("#doors").hidden=false;
+  const t=advNow(),ready=advReady();
+  $("#advMsg").textContent=t.m===11||t.m===0?(ready.length?`Lucka ${ready.join(", ")} kan öppnas! Tryck på den som skakar.`:t.m===11&&t.d<24?`Bra! Nästa lucka öppnas i morgon.`:`God jul, ${S.name}! Alla luckor är öppnade.`):
+    `Kalendern börjar den 1 december. Det är ${daysUntil(1)} dagar kvar!`;
+  $("#doors").innerHTML=DOOR_ORDER.map((d,i)=>{const q=XMAS[d-1],has=S.owned.includes(q.id),ok=advOpenDay(d);
+    return has?`<button class="door open" data-d="${d}" aria-label="Lucka ${d}, öppnad"><span class="dnum">${d}</span>${sqSVG(q,false)}</button>`:
+      `<button class="door c${i%3} ${ok?"ready":"locked"}" data-d="${d}" aria-label="Lucka ${d}">${d}</button>`}).join("");
+  document.querySelectorAll(".door").forEach(b=>b.onclick=()=>{const d=+b.dataset.d,q=XMAS[d-1];
+    if(S.owned.includes(q.id))return openPlay(q);
+    if(!advOpenDay(d)){b.classList.remove("wrong");void b.offsetWidth;b.classList.add("wrong");const n=daysUntil(d);
+      $("#advMsg").textContent=`Lucka ${d} öppnas den ${d} december. ${n===1?"Bara 1 dag kvar!":`Det är ${n} dagar kvar.`}`;return}
+    openDoor(d)});
+  if(t.m===11||t.m===0)snow(18);
+}
+function openDoor(d){
+  const q=XMAS[d-1],xq=XQ[d];$("#stage").innerHTML="";$("#advMsg").textContent=`Lucka ${d}!`;$("#doors").hidden=true;const st=$("#advStage");st.hidden=false;
+  M=M||{streak:0};
+  st.innerHTML=`<div class="card">
+    <p class="ask">Lucka ${d}! Läs meningen och välj rätt bild för att öppna.</p>
+    <div class="read">${tappable(fill(xq.t))}</div>
+    <div class="pics">${shuffle([xq.a,...xq.d]).map(e=>`<button class="pic" data-e="${e}" aria-label="Bild">${e}</button>`).join("")}</div>${tail}`;
+  answer(xq.a,()=>setTimeout(()=>{
+    S.owned.push(q.id);save();
+    st.innerHTML=`<div class="card reward">
+      <h2>Lucka ${d}: ${esc(q.n)}!</h2>
+      <div id="xSq">${sqSVG(q,false,"sq-big sq-reveal")}</div>
+      <span class="rar r${rar(q)}">${RAR[rar(q)]}</span>
+      <p class="note">Tryck och dra i den!</p>
+      <button class="btn mint" id="backDoors">Tillbaka till kalendern</button></div>`;
+    makeSquishable($("#xSq svg"),q);$("#backDoors").onclick=renderAdvent;
+    snow(60);party(true,0,`${q.n}! ${d===24?"God jul!":""}`);
+  },700));
+}
+function snow(n){if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  for(let i=0;i<n;i++){const f=document.createElement("span");f.className="snow";f.textContent=pick(["❄","❅","•","❆"]);
+    f.style.left=Math.random()*100+"vw";f.style.fontSize=(10+Math.random()*18)+"px";const dur=4+Math.random()*5;
+    f.style.animationDuration=dur+"s";f.style.animationDelay=Math.random()*3+"s";document.body.appendChild(f);setTimeout(()=>f.remove(),(dur+3.5)*1000)}}
+$("#toAdvent").onclick=()=>show("advent");
 
 /* ---------- grown-ups ---------- */
 function renderGrown(){
